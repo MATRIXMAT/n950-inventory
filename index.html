@@ -1,0 +1,312 @@
+<!doctype html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+  <meta name="theme-color" content="#0b1220">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <title>مخزون أجهزة N950</title>
+  <link rel="manifest" href="manifest.webmanifest">
+  <style>
+    *{box-sizing:border-box}
+    :root{
+      --bg:#09111f;--card:#111b2c;--card2:#17243a;--line:#2b3a52;
+      --text:#f8fafc;--muted:#9fb0c7;--green:#16a34a;--green2:#22c55e;
+      --red:#dc2626;--amber:#d97706;--blue:#2563eb;--purple:#7c3aed;
+    }
+    body{margin:0;background:var(--bg);color:var(--text);font-family:system-ui,-apple-system,"Segoe UI",Tahoma,Arial,sans-serif;min-height:100vh;padding:12px}
+    .app{width:min(760px,100%);margin:auto}
+    .hero{text-align:center;padding:10px 4px 14px}
+    .hero h1{margin:0;font-size:28px}
+    .sub{color:var(--muted);font-size:14px;margin-top:6px;line-height:1.6}
+    .stats{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:12px}
+    .stat{background:var(--card);border:1px solid var(--line);border-radius:20px;padding:15px 10px;text-align:center}
+    .stat .label{color:#cbd5e1;font-weight:800;font-size:14px}
+    .stat .n{font-size:38px;font-weight:950;margin-top:4px}
+    .stat.stock .n{color:#86efac}.stat.delivered .n{color:#93c5fd}
+    .card{background:var(--card);border:1px solid var(--line);border-radius:20px;padding:14px;margin-bottom:12px}
+    .section-title{font-size:17px;font-weight:900;margin-bottom:10px}
+    .mode-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+    button{border:0;border-radius:14px;padding:14px 14px;font-size:16px;font-weight:900;cursor:pointer;min-height:50px}
+    .receive{background:var(--green);color:#fff}.deliver{background:var(--blue);color:#fff}.secondary{background:#27364d;color:#fff}.danger{background:#451a1a;color:#fecaca}.amber{background:#4a2d08;color:#fed7aa}.purple{background:var(--purple);color:#fff}
+    .mode-btn.active{outline:3px solid #fff;outline-offset:2px}
+    .mode-banner{margin-top:10px;padding:12px;border-radius:14px;text-align:center;font-weight:900;background:#0f172a;color:#cbd5e1}
+    .mode-banner.receive-mode{background:#12331f;color:#86efac}.mode-banner.deliver-mode{background:#122b50;color:#bfdbfe}
+    .camera-wrap{position:relative;background:#000;border-radius:16px;overflow:hidden;aspect-ratio:4/3;border:1px solid var(--line)}
+    video{width:100%;height:100%;object-fit:cover;display:block}
+    .scan-box{position:absolute;left:7%;right:7%;top:37%;height:26%;border:3px solid var(--green2);border-radius:14px;box-shadow:0 0 0 9999px rgba(0,0,0,.35);pointer-events:none}
+    .scan-line{position:absolute;left:11%;right:11%;top:50%;height:2px;background:var(--green2);box-shadow:0 0 10px var(--green2);animation:scan 1.7s linear infinite}
+    @keyframes scan{0%{transform:translateY(-42px)}50%{transform:translateY(42px)}100%{transform:translateY(-42px)}}
+    .camera-msg{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;text-align:center;padding:22px;color:#d1d5db;background:#030712;line-height:1.8}
+    .row{display:flex;gap:10px;flex-wrap:wrap}.row button{flex:1;min-width:130px}
+    .camera-tools{display:none;grid-template-columns:1fr 1fr;gap:10px;margin-top:10px}
+    .zoom-wrap{display:none;margin-top:10px;background:#0f172a;border:1px solid var(--line);border-radius:14px;padding:11px}
+    .zoom-head{display:flex;justify-content:space-between;align-items:center;color:#cbd5e1;font-weight:800;margin-bottom:6px}
+    input{width:100%;padding:14px;border-radius:14px;border:1px solid var(--line);background:var(--card2);color:#fff;font-size:17px;outline:none}
+    input:focus{border-color:var(--green2)}input[type="range"]{padding:0;height:32px;border:0;background:transparent;accent-color:var(--green2)}
+    .status{margin-top:10px;padding:12px;border-radius:14px;background:#0f172a;color:#cbd5e1;text-align:center;font-weight:850;min-height:46px;line-height:1.5}
+    .ok{background:#12331f;color:#86efac}.bad{background:#3d1717;color:#fecaca}.warn{background:#412b0c;color:#fde68a}
+    .hint{color:var(--muted);font-size:13px;margin-top:8px;line-height:1.7}
+    .report-box{background:#0d1727;border:1px solid var(--line);border-radius:16px;padding:14px;text-align:center;margin-bottom:10px}
+    .report-text{font-size:20px;font-weight:950;line-height:1.8;white-space:pre-line}
+    .toolbar{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+    .filters{display:flex;gap:7px;overflow:auto;margin-bottom:10px}.filters button{min-height:40px;padding:9px 12px;font-size:14px;white-space:nowrap;background:#27364d;color:#fff}.filters button.active{background:#475569}
+    .table-wrap{overflow:auto;border:1px solid var(--line);border-radius:14px;max-height:420px}
+    table{width:100%;border-collapse:collapse;min-width:600px}th,td{padding:11px;border-bottom:1px solid #243146;text-align:center}th{background:#1c2739;position:sticky;top:0;z-index:1}.serial{font-family:ui-monospace,SFMono-Regular,Consolas,monospace;font-weight:900}.badge{display:inline-block;padding:6px 9px;border-radius:999px;font-size:12px;font-weight:900}.in{background:#12331f;color:#86efac}.out{background:#122b50;color:#bfdbfe}
+    .small-btn{min-height:34px;padding:7px 9px;font-size:12px;background:#27364d;color:#fff;border-radius:9px}.small-danger{background:#451a1a;color:#fecaca}
+    .empty{padding:24px;text-align:center;color:var(--muted)}.footer-note{text-align:center;color:#64748b;font-size:12px;line-height:1.7;padding:4px 8px 20px}.install{display:none;width:100%;margin-top:10px}
+    @media(max-width:520px){body{padding:9px}.hero h1{font-size:24px}.stat .n{font-size:34px}.card{padding:11px}.mode-grid,.toolbar{grid-template-columns:1fr 1fr}.row button{min-width:0}.report-text{font-size:18px}}
+  </style>
+</head>
+<body>
+<main class="app">
+  <section class="hero">
+    <h1>📦 مخزون أجهزة N950</h1>
+    <div class="sub">استلام الأجهزة → تسليمها للعملاء → تعرف المتبقي فورًا</div>
+  </section>
+
+  <section class="stats">
+    <div class="stat stock"><div class="label">📦 المتبقي في المخزون</div><div class="n" id="stockCount">0</div></div>
+    <div class="stat delivered"><div class="label">📤 تم التسليم</div><div class="n" id="deliveredCount">0</div></div>
+  </section>
+
+  <section class="card">
+    <div class="section-title">اختر العملية</div>
+    <div class="mode-grid">
+      <button id="receiveModeBtn" class="mode-btn receive">📥 استلام أجهزة</button>
+      <button id="deliverModeBtn" class="mode-btn deliver">📤 تسليم أجهزة</button>
+    </div>
+    <div id="modeBanner" class="mode-banner">اختر «استلام» أو «تسليم» قبل المسح</div>
+  </section>
+
+  <section class="card">
+    <div class="camera-wrap">
+      <video id="video" playsinline muted></video>
+      <div class="scan-box" id="scanBox" style="display:none"></div>
+      <div class="scan-line" id="scanLine" style="display:none"></div>
+      <div class="camera-msg" id="cameraMsg">اختر العملية أولًا، ثم شغّل الكاميرا وامسح باركود SN</div>
+    </div>
+    <div class="row" style="margin-top:10px">
+      <button class="receive" id="startBtn">📷 تشغيل الكاميرا</button>
+      <button class="secondary" id="stopBtn" disabled>⏹️ إيقاف</button>
+    </div>
+    <div class="camera-tools" id="cameraTools">
+      <button class="secondary" id="refocusBtn">🎯 تحسين التركيز</button>
+      <button class="secondary" id="torchBtn" style="display:none">🔦 تشغيل الفلاش</button>
+    </div>
+    <div class="zoom-wrap" id="zoomWrap">
+      <div class="zoom-head"><span>🔍 تكبير الكاميرا</span><span id="zoomValue">1.0×</span></div>
+      <input id="zoomSlider" type="range" min="1" max="1" step="0.1" value="1">
+    </div>
+    <div class="status" id="status">جاهز</div>
+    <div class="hint">السيريال المقبول مثل <b>NCD700280982</b>. عند النجاح: صوت + اهتزاز + وميض أخضر. عند الخطأ: صوت مختلف + وميض أحمر.</div>
+  </section>
+
+  <section class="card">
+    <div class="section-title">إدخال يدوي عند الحاجة</div>
+    <div class="row">
+      <input id="manual" autocomplete="off" autocapitalize="characters" spellcheck="false" placeholder="NCD700280982">
+      <button class="secondary" id="manualBtn">تنفيذ</button>
+    </div>
+  </section>
+
+  <section class="card">
+    <div class="section-title">📋 رسالة المدير</div>
+    <div class="report-box"><div class="report-text" id="reportText">سلمت 0 جهاز\nمتبقي 0 جهاز</div></div>
+    <div class="toolbar">
+      <button class="purple" id="copyReportBtn">📋 نسخ الرسالة</button>
+      <button class="amber" id="resetDeliveredBtn">🔄 تصفير عداد التسليم</button>
+    </div>
+    <div class="hint">تصفير عداد التسليم لا يحذف المخزون. فقط يبدأ عدّ «سلمت» من جديد للمرة القادمة التي يسألك فيها المدير.</div>
+  </section>
+
+  <section class="card">
+    <div class="section-title">الأجهزة</div>
+    <div class="filters">
+      <button id="filterStock" class="active">المتبقي</button>
+      <button id="filterDelivered">المسلّم</button>
+      <button id="filterAll">الكل</button>
+    </div>
+    <div class="table-wrap">
+      <table>
+        <thead><tr><th>#</th><th>Serial Number</th><th>الحالة</th><th>إجراء</th></tr></thead>
+        <tbody id="tbody"></tbody>
+      </table>
+      <div class="empty" id="empty">لا توجد أجهزة حتى الآن.</div>
+    </div>
+    <div class="toolbar" style="margin-top:10px">
+      <button class="secondary" id="excelBtn">📊 تحميل Excel</button>
+      <button class="secondary" id="copyStockBtn">📋 نسخ سيريالات المتبقي</button>
+    </div>
+    <button class="secondary install" id="installBtn">📲 تثبيت التطبيق على الجوال</button>
+  </section>
+
+  <div class="footer-note">البيانات محفوظة على هذا الجوال فقط، لذلك زملاؤك إذا فتحوا نفس الرابط لن يروا مخزونك. لا تمسح بيانات Chrome قبل أخذ نسخة من Excel.</div>
+</main>
+
+<script>
+const MODEL = "Newland N950";
+const SERIAL_RE = /^NCD\d{9}$/i;
+const STORAGE_KEY = "n950_inventory_v2_devices";
+const RESET_KEY = "n950_inventory_v2_report_reset";
+
+let devices = loadDevices();
+let reportResetAt = Number(localStorage.getItem(RESET_KEY) || "0");
+let mode = null; // receive | deliver
+let filter = "stock";
+let stream = null, detector = null, videoTrack = null, scanTimer = null;
+let scanning = false, torchOn = false, audioCtx = null;
+let activeSeen = "", lastValidSeenAt = 0;
+
+const $ = id => document.getElementById(id);
+const video=$("video"), startBtn=$("startBtn"), stopBtn=$("stopBtn"), statusEl=$("status");
+const cameraMsg=$("cameraMsg"), scanBox=$("scanBox"), scanLine=$("scanLine"), cameraTools=$("cameraTools");
+const refocusBtn=$("refocusBtn"), torchBtn=$("torchBtn"), zoomWrap=$("zoomWrap"), zoomSlider=$("zoomSlider"), zoomValue=$("zoomValue");
+const manual=$("manual"), tbody=$("tbody"), empty=$("empty"), modeBanner=$("modeBanner");
+
+function normalizeSerial(v){return String(v||"").trim().toUpperCase().replace(/\s+/g,"")}
+function loadDevices(){
+  try{
+    const x=JSON.parse(localStorage.getItem(STORAGE_KEY)||"[]");
+    return Array.isArray(x)?x.filter(d=>d&&SERIAL_RE.test(d.serial||"")):[];
+  }catch{return []}
+}
+function saveDevices(){localStorage.setItem(STORAGE_KEY,JSON.stringify(devices))}
+function setStatus(text,kind=""){statusEl.className="status"+(kind?" "+kind:"");statusEl.textContent=text}
+function stockDevices(){return devices.filter(d=>d.status==="stock")}
+function deliveredSinceReset(){return devices.filter(d=>d.status==="delivered"&&Number(new Date(d.deliveredAt))>=reportResetAt)}
+
+function unlockAudio(){
+  try{if(!audioCtx) audioCtx=new (window.AudioContext||window.webkitAudioContext)(); if(audioCtx.state==="suspended") audioCtx.resume()}catch{}
+}
+function tone(freq,start,duration,type="sine",gainValue=.26){
+  if(!audioCtx)return;
+  const o=audioCtx.createOscillator(),g=audioCtx.createGain();
+  o.type=type;o.frequency.setValueAtTime(freq,start);g.gain.setValueAtTime(.0001,start);g.gain.exponentialRampToValueAtTime(gainValue,start+.012);g.gain.exponentialRampToValueAtTime(.0001,start+duration);o.connect(g);g.connect(audioCtx.destination);o.start(start);o.stop(start+duration+.03)
+}
+function successFeedback(){
+  try{navigator.vibrate?.([130,60,130])}catch{}
+  try{unlockAudio();const n=audioCtx.currentTime;tone(950,n,.12);tone(1350,n+.14,.16)}catch{}
+  flash("rgba(34,197,94,.95)")
+}
+function errorFeedback(){
+  try{navigator.vibrate?.([220,80,220])}catch{}
+  try{unlockAudio();const n=audioCtx.currentTime;tone(430,n,.18,"square",.18);tone(270,n+.2,.24,"square",.16)}catch{}
+  flash("rgba(239,68,68,.95)")
+}
+function flash(color){document.body.animate([{boxShadow:"inset 0 0 0 0 transparent"},{boxShadow:`inset 0 0 0 9px ${color}`},{boxShadow:"inset 0 0 0 0 transparent"}],{duration:480,easing:"ease-out"})}
+
+function setMode(next){
+  mode=next;
+  $("receiveModeBtn").classList.toggle("active",mode==="receive");
+  $("deliverModeBtn").classList.toggle("active",mode==="deliver");
+  if(mode==="receive"){
+    modeBanner.className="mode-banner receive-mode";modeBanner.textContent="📥 وضع الاستلام: أي سيريال جديد سيُضاف إلى مخزونك";scanBox.style.borderColor="#22c55e";scanLine.style.background="#22c55e";setStatus("وضع الاستلام جاهز. شغّل الكاميرا وابدأ المسح.")
+  }else{
+    modeBanner.className="mode-banner deliver-mode";modeBanner.textContent="📤 وضع التسليم: أي جهاز تمسحه سيُخصم من المخزون";scanBox.style.borderColor="#60a5fa";scanLine.style.background="#60a5fa";setStatus("وضع التسليم جاهز. امسح الأجهزة التي سلمتها للعميل.")
+  }
+  unlockAudio();
+}
+
+function processSerial(raw){
+  const serial=normalizeSerial(raw);
+  if(!mode){setStatus("❌ اختر استلام أو تسليم أولًا.","bad");errorFeedback();return false}
+  if(!SERIAL_RE.test(serial)){setStatus("❌ هذا ليس سيريال N950 صالحًا: "+serial,"bad");errorFeedback();return false}
+  const existing=devices.find(d=>d.serial===serial);
+
+  if(mode==="receive"){
+    if(existing){
+      setStatus(existing.status==="stock"?"❌ الجهاز موجود أصلًا في مخزونك: "+serial:"❌ هذا السيريال مسجل مسبقًا وتم تسليمه: "+serial,"bad");errorFeedback();return false
+    }
+    devices.push({model:MODEL,serial,status:"stock",receivedAt:new Date().toISOString(),deliveredAt:null});
+    saveDevices();render();setStatus("✅ تم استلام وإضافة الجهاز: "+serial,"ok");successFeedback();return true
+  }
+
+  if(!existing){setStatus("❌ هذا الجهاز غير موجود في مخزونك: "+serial,"bad");errorFeedback();return false}
+  if(existing.status==="delivered"){setStatus("❌ هذا الجهاز تم تسليمه مسبقًا: "+serial,"bad");errorFeedback();return false}
+  existing.status="delivered";existing.deliveredAt=new Date().toISOString();
+  saveDevices();render();setStatus("✅ تم التسليم وخصم الجهاز من المخزون: "+serial,"ok");successFeedback();return true
+}
+
+function render(){
+  const stock=stockDevices().length,delivered=deliveredSinceReset().length;
+  $("stockCount").textContent=stock;$("deliveredCount").textContent=delivered;
+  $("reportText").textContent=`سلمت ${delivered} جهاز\nمتبقي ${stock} جهاز`;
+  renderTable();
+}
+function renderTable(){
+  let list=devices;
+  if(filter==="stock") list=devices.filter(d=>d.status==="stock");
+  if(filter==="delivered") list=devices.filter(d=>d.status==="delivered");
+  tbody.innerHTML="";empty.style.display=list.length?"none":"block";
+  [...list].reverse().forEach((d,i)=>{
+    const tr=document.createElement("tr");
+    const badge=d.status==="stock"?'<span class="badge in">متبقي</span>':'<span class="badge out">تم التسليم</span>';
+    const action=d.status==="delivered"?`<button class="small-btn return-btn" data-s="${d.serial}">↩️ إرجاع للمخزون</button>`:`<button class="small-btn small-danger delete-btn" data-s="${d.serial}">حذف</button>`;
+    tr.innerHTML=`<td>${i+1}</td><td class="serial">${d.serial}</td><td>${badge}</td><td>${action}</td>`;tbody.appendChild(tr)
+  });
+  tbody.querySelectorAll(".return-btn").forEach(b=>b.onclick=()=>returnToStock(b.dataset.s));
+  tbody.querySelectorAll(".delete-btn").forEach(b=>b.onclick=()=>deleteStock(b.dataset.s));
+}
+function returnToStock(serial){
+  const d=devices.find(x=>x.serial===serial);if(!d)return;
+  if(confirm(`إرجاع ${serial} إلى المخزون؟`)){d.status="stock";d.deliveredAt=null;saveDevices();render();setStatus("↩️ رجع الجهاز إلى المخزون: "+serial,"ok")}
+}
+function deleteStock(serial){
+  if(confirm(`حذف ${serial} نهائيًا من المخزون؟`)){devices=devices.filter(x=>x.serial!==serial);saveDevices();render();setStatus("تم حذف الجهاز.")}
+}
+
+async function startCamera(){
+  unlockAudio();
+  if(!mode){setStatus("❌ اختر استلام أو تسليم أولًا.","bad");errorFeedback();return}
+  if(!navigator.mediaDevices?.getUserMedia){setStatus("❌ المتصفح لا يدعم الكاميرا.","bad");return}
+  if(!("BarcodeDetector" in window)){setStatus("❌ ماسح الباركود غير مدعوم. استخدم Chrome على Android.","bad");return}
+  try{
+    const formats=await BarcodeDetector.getSupportedFormats();
+    const wanted=["code_128","code_39","ean_13","ean_8","itf","codabar"].filter(x=>formats.includes(x));
+    detector=new BarcodeDetector({formats:wanted.length?wanted:formats});
+    stream=await navigator.mediaDevices.getUserMedia({video:{facingMode:{ideal:"environment"},width:{ideal:2560},height:{ideal:1440},frameRate:{ideal:30,max:30}},audio:false});
+    video.srcObject=stream;await video.play();videoTrack=stream.getVideoTracks()[0]||null;await optimizeCamera();
+    scanning=true;startBtn.disabled=true;stopBtn.disabled=false;cameraMsg.style.display="none";scanBox.style.display="block";scanLine.style.display="block";cameraTools.style.display="grid";activeSeen="";lastValidSeenAt=0;
+    setStatus(mode==="receive"?"📥 امسح كل أجهزة الدفعة واحدًا واحدًا.":"📤 امسح فقط الأجهزة التي سلمتها للعميل.");scanLoop()
+  }catch(e){console.error(e);setStatus("❌ تعذر تشغيل الكاميرا. تأكد من إذن الكاميرا.","bad")}
+}
+async function optimizeCamera(){
+  if(!videoTrack)return;let caps={};try{caps=videoTrack.getCapabilities?videoTrack.getCapabilities():{}}catch{}
+  const adv=[];if(Array.isArray(caps.focusMode)&&caps.focusMode.includes("continuous"))adv.push({focusMode:"continuous"});if(Array.isArray(caps.exposureMode)&&caps.exposureMode.includes("continuous"))adv.push({exposureMode:"continuous"});if(Array.isArray(caps.whiteBalanceMode)&&caps.whiteBalanceMode.includes("continuous"))adv.push({whiteBalanceMode:"continuous"});if(adv.length)try{await videoTrack.applyConstraints({advanced:adv})}catch{}
+  if(caps.zoom&&Number.isFinite(caps.zoom.min)&&Number.isFinite(caps.zoom.max)){const min=caps.zoom.min,max=caps.zoom.max,step=caps.zoom.step||.1,preferred=Math.min(max,Math.max(min,2));zoomSlider.min=min;zoomSlider.max=max;zoomSlider.step=step;zoomSlider.value=preferred;zoomValue.textContent=preferred.toFixed(1)+"×";zoomWrap.style.display="block";try{await videoTrack.applyConstraints({advanced:[{zoom:preferred}]})}catch{}}else zoomWrap.style.display="none";
+  torchBtn.style.display=caps.torch===true?"block":"none"
+}
+async function refocusCamera(){if(!videoTrack)return;try{const c=videoTrack.getCapabilities?videoTrack.getCapabilities():{};if(Array.isArray(c.focusMode)&&c.focusMode.includes("continuous")){await videoTrack.applyConstraints({advanced:[{focusMode:"continuous"}]});setStatus("🎯 تم تحسين التركيز. ثبّت الجوال لحظة.","ok")}else setStatus("ابتعد قليلًا عن الباركود حتى يضبط التركيز.")}catch{}}
+function stopCamera(){scanning=false;if(scanTimer)cancelAnimationFrame(scanTimer);scanTimer=null;if(stream){stream.getTracks().forEach(t=>t.stop());stream=null}video.srcObject=null;videoTrack=null;torchOn=false;cameraTools.style.display="none";zoomWrap.style.display="none";torchBtn.style.display="none";torchBtn.textContent="🔦 تشغيل الفلاش";startBtn.disabled=false;stopBtn.disabled=true;cameraMsg.style.display="flex";cameraMsg.textContent="شغّل الكاميرا للمتابعة";scanBox.style.display="none";scanLine.style.display="none";activeSeen=""}
+async function scanLoop(){
+  if(!scanning)return;
+  try{
+    if(video.readyState>=2&&detector){
+      const codes=await detector.detect(video),now=Date.now();let sawActive=false;
+      for(const c of codes){const v=normalizeSerial(c.rawValue);if(!SERIAL_RE.test(v))continue;sawActive=true;lastValidSeenAt=now;if(v===activeSeen)break;activeSeen=v;processSerial(v);break}
+      if(!sawActive&&activeSeen&&(now-lastValidSeenAt>1200))activeSeen="";
+    }
+  }catch{}
+  scanTimer=requestAnimationFrame(scanLoop)
+}
+
+$("receiveModeBtn").onclick=()=>setMode("receive");$("deliverModeBtn").onclick=()=>setMode("deliver");startBtn.onclick=startCamera;stopBtn.onclick=stopCamera;refocusBtn.onclick=refocusCamera;
+zoomSlider.oninput=async()=>{if(!videoTrack)return;const z=Number(zoomSlider.value);zoomValue.textContent=z.toFixed(1)+"×";try{await videoTrack.applyConstraints({advanced:[{zoom:z}]})}catch{}};
+torchBtn.onclick=async()=>{if(!videoTrack)return;torchOn=!torchOn;try{await videoTrack.applyConstraints({advanced:[{torch:torchOn}]});torchBtn.textContent=torchOn?"🔦 إطفاء الفلاش":"🔦 تشغيل الفلاش"}catch{torchOn=false;setStatus("تعذر تشغيل الفلاش.","bad")}};
+$("manualBtn").onclick=()=>{unlockAudio();if(processSerial(manual.value))manual.value=""};manual.onkeydown=e=>{if(e.key==="Enter"){unlockAudio();if(processSerial(manual.value))manual.value=""}};
+$("copyReportBtn").onclick=async()=>{const txt=`سلمت ${deliveredSinceReset().length} جهاز\nمتبقي ${stockDevices().length} جهاز`;try{await navigator.clipboard.writeText(txt);setStatus("✅ تم نسخ الرسالة. الصقها مباشرة في القروب.","ok");successFeedback()}catch{setStatus("تعذر النسخ من المتصفح.","bad")}};
+$("resetDeliveredBtn").onclick=()=>{const n=deliveredSinceReset().length;if(confirm(`سيتم تصفير عداد «سلمت ${n}».\nالمخزون لن يتغير. هل تريد المتابعة؟`)){reportResetAt=Date.now();localStorage.setItem(RESET_KEY,String(reportResetAt));render();setStatus("✅ تم تصفير عداد التسليم فقط. المخزون كما هو.","ok")}};
+function setFilter(f){filter=f;["filterStock","filterDelivered","filterAll"].forEach(id=>$(id).classList.remove("active"));$(f==="stock"?"filterStock":f==="delivered"?"filterDelivered":"filterAll").classList.add("active");renderTable()}
+$("filterStock").onclick=()=>setFilter("stock");$("filterDelivered").onclick=()=>setFilter("delivered");$("filterAll").onclick=()=>setFilter("all");
+$("copyStockBtn").onclick=async()=>{const list=stockDevices();if(!list.length){setStatus("لا توجد أجهزة متبقية للنسخ.","warn");return}try{await navigator.clipboard.writeText(list.map(x=>x.serial).join("\n"));setStatus("✅ تم نسخ سيريالات المتبقي.","ok")}catch{setStatus("تعذر النسخ.","bad")}};
+function esc(s){return String(s).replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]))}
+$("excelBtn").onclick=()=>{if(!devices.length){setStatus("لا توجد بيانات لإنشاء Excel.","bad");return}const rows=devices.map((d,i)=>`<tr><td>${i+1}</td><td>${esc(MODEL)}</td><td style="mso-number-format:'\\@'">${esc(d.serial)}</td><td>${d.status==="stock"?"متبقي":"تم التسليم"}</td><td>${d.receivedAt?new Date(d.receivedAt).toLocaleString("ar-SA"):""}</td><td>${d.deliveredAt?new Date(d.deliveredAt).toLocaleString("ar-SA"):""}</td></tr>`).join("");const html=`<!doctype html><html><head><meta charset="utf-8"></head><body><table border="1"><tr><th>#</th><th>نوع الجهاز</th><th>Serial Number</th><th>الحالة</th><th>تاريخ الاستلام</th><th>تاريخ التسليم</th></tr>${rows}</table></body></html>`;const blob=new Blob(["\ufeff",html],{type:"application/vnd.ms-excel;charset=utf-8"}),url=URL.createObjectURL(blob),a=document.createElement("a");a.href=url;a.download=`N950_Inventory_${new Date().toISOString().slice(0,10)}.xls`;document.body.appendChild(a);a.click();a.remove();setTimeout(()=>URL.revokeObjectURL(url),1000);setStatus("✅ تم إنشاء ملف Excel.","ok")};
+
+let deferredPrompt=null;const installBtn=$("installBtn");window.addEventListener("beforeinstallprompt",e=>{e.preventDefault();deferredPrompt=e;installBtn.style.display="block"});installBtn.onclick=async()=>{if(!deferredPrompt)return;deferredPrompt.prompt();await deferredPrompt.userChoice;deferredPrompt=null;installBtn.style.display="none"};
+window.addEventListener("beforeunload",stopCamera);if("serviceWorker" in navigator)window.addEventListener("load",()=>navigator.serviceWorker.register("sw.js"));
+render();
+</script>
+</body>
+</html>

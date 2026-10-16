@@ -1,0 +1,14 @@
+{
+  "name": "مخزون أجهزة Newland N950",
+  "short_name": "مخزون N950",
+  "start_url": "./",
+  "display": "standalone",
+  "background_color": "#09111f",
+  "theme_color": "#0b1220",
+  "lang": "ar",
+  "dir": "rtl",
+  "icons": [
+    {"src":"icon-192.png","sizes":"192x192","type":"image/png"},
+    {"src":"icon-512.png","sizes":"512x512","type":"image/png"}
+  ]
+}
