@@ -1,6 +1,6 @@
 {
-  "name": "مخزون أجهزة Newland N950",
-  "short_name": "Neoleap Stock",
+  "name": "NeoLeap Inventory",
+  "short_name": "Inventory",
   "start_url": "./",
   "display": "standalone",
   "background_color": "#09111f",
