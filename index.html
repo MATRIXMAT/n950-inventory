@@ -22,7 +22,8 @@
     .hero:after{content:"";position:absolute;width:150px;height:150px;background:#10b98114;border-radius:50%;left:-55px;top:-65px}.hero .chip{display:inline-block;background:#fff;border:1px solid #d7f0e5;color:#07865f;padding:7px 10px;border-radius:999px;font-size:11px;font-weight:850}.hero h1{font-size:24px;margin:12px 0 6px}.hero p{margin:0;color:var(--muted);font-size:13px;line-height:1.7}
     .stats{display:grid;grid-template-columns:repeat(3,1fr);gap:9px;margin:13px 0}.stat{background:#fff;border:1px solid var(--line);border-radius:20px;padding:13px 7px;text-align:center;box-shadow:0 4px 14px rgba(15,23,42,.045)}.stat .ico{width:37px;height:37px;margin:0 auto 8px;border-radius:13px;display:grid;place-items:center;font-size:19px}.stat.stock .ico{background:var(--greenSoft)}.stat.delivered .ico{background:var(--blueSoft)}.stat.total .ico{background:var(--purpleSoft)}.stat strong{display:block;font-size:26px}.stat span{font-size:11px;color:var(--muted);font-weight:750}
     .section-head{display:flex;justify-content:space-between;align-items:center;margin:18px 2px 9px}.section-head h2{margin:0;font-size:17px}.section-head span{font-size:11px;color:var(--muted)}
-    .quick{display:grid;grid-template-columns:1fr 1fr;gap:10px}.quick button{min-height:124px;border-radius:23px;text-align:right;padding:15px;border:1px solid var(--line);box-shadow:0 6px 18px rgba(15,23,42,.05)}.quick .receive{background:linear-gradient(145deg,#fff,#edfdf7);color:#123a2f}.quick .deliver{background:linear-gradient(145deg,#fff,#eff6ff);color:#17365c}.qico{width:46px;height:46px;border-radius:15px;display:grid;place-items:center;font-size:23px;margin-bottom:13px}.receive .qico{background:#dff8ef}.deliver .qico{background:#e4f0ff}.quick b{display:block;font-size:17px}.quick small{display:block;margin-top:5px;color:var(--muted);line-height:1.5}
+    .activity-toggle{background:var(--greenSoft);color:#07865f;border:1px solid #ccefe2;border-radius:999px;padding:7px 11px;font-size:11px;font-weight:900}.activity-toggle:active{transform:scale(.98)}
+.quick{display:grid;grid-template-columns:1fr 1fr;gap:10px}.quick button{min-height:124px;border-radius:23px;text-align:right;padding:15px;border:1px solid var(--line);box-shadow:0 6px 18px rgba(15,23,42,.05)}.quick .receive{background:linear-gradient(145deg,#fff,#edfdf7);color:#123a2f}.quick .deliver{background:linear-gradient(145deg,#fff,#eff6ff);color:#17365c}.qico{width:46px;height:46px;border-radius:15px;display:grid;place-items:center;font-size:23px;margin-bottom:13px}.receive .qico{background:#dff8ef}.deliver .qico{background:#e4f0ff}.quick b{display:block;font-size:17px}.quick small{display:block;margin-top:5px;color:var(--muted);line-height:1.5}
     .card{background:#fff;border:1px solid var(--line);border-radius:23px;padding:15px;box-shadow:0 5px 19px rgba(15,23,42,.05);margin-bottom:11px}.report-card{background:linear-gradient(135deg,#0f9f74,#10b981);color:#fff;border:0}.report-values{display:flex;gap:26px;margin:11px 0 14px}.report-values strong{font-size:27px}.report-values span{font-size:12px;opacity:.9;margin-right:5px}.white-btn{width:100%;padding:12px;border-radius:14px;background:#fff;color:#087e5c;font-weight:900}
     .activity{display:flex;align-items:center;gap:10px;padding:10px 0;border-bottom:1px solid #f0f3f4}.activity:last-child{border-bottom:0}.actico{width:37px;height:37px;border-radius:12px;display:grid;place-items:center;flex:none}.actico.receive{background:var(--greenSoft)}.actico.deliver{background:var(--blueSoft)}.actmain{flex:1;min-width:0}.actmain b{display:block;direction:ltr;text-align:right;font-size:13px}.actmain span,.time{font-size:11px;color:var(--muted)}.empty{text-align:center;color:var(--muted);padding:22px 8px;font-size:13px}
     .search{width:100%;border:1px solid var(--line);background:#fff;border-radius:15px;padding:13px;outline:none}.search:focus{border-color:#8dddc1;box-shadow:0 0 0 3px #10b98112}.segments{display:flex;background:#e9eef1;padding:4px;border-radius:14px;gap:4px;margin:10px 0}.segments button{flex:1;padding:9px 4px;border-radius:11px;background:transparent;color:#68757d;font-weight:850;font-size:12px}.segments button.active{background:#fff;color:#0b8e67;box-shadow:0 2px 8px #0000000f}
@@ -59,7 +60,7 @@
       </div>
       <div class="section-head"><h2>تقرير سريع</h2><span>جاهز للقروب</span></div>
       <div class="card report-card"><div>رسالة المدير</div><div class="report-values"><div><strong id="reportDeliveredHome">0</strong><span>سلمت</span></div><div><strong id="reportStockHome">0</strong><span>متبقي</span></div></div><button class="white-btn" id="copyReportHome">نسخ الرسالة</button></div>
-      <div class="section-head"><h2>آخر النشاط</h2><span id="activityCount"></span></div>
+      <div class="section-head"><h2>آخر العمليات</h2><button class="activity-toggle" id="toggleActivityBtn">عرض كل العمليات</button></div>
       <div class="card" id="activityList"></div>
     </section>
 
@@ -123,6 +124,7 @@ const MODE_KEY="n950_inventory_v2_last_mode";
 const $=id=>document.getElementById(id);
 let devices=loadDevices();
 let currentFilter="all",searchTerm="";
+let showAllActivities=false;
 let mode=localStorage.getItem(MODE_KEY)==="deliver"?"deliver":"receive";
 let stream=null,videoTrack=null,detector=null,scanning=false,scanFrame=null,activeSeen="",lastSeenAt=0,torchOn=false,audioCtx=null;
 
@@ -149,7 +151,20 @@ function render(){
   $("homeTotal").textContent=t;$("invTotal").textContent=t;$("invDelivered").textContent=delivered().length;
   renderActivity();renderInventory();
 }
-function renderActivity(){const list=$("activityList");const acts=[];devices.forEach(x=>{if(x.receivedAt)acts.push({type:"receive",serial:x.serial,time:Number(x.receivedAt)});if(x.deliveredAt)acts.push({type:"deliver",serial:x.serial,time:Number(x.deliveredAt)})});acts.sort((a,b)=>b.time-a.time);const top=acts.slice(0,5);$("activityCount").textContent=top.length?`آخر ${top.length} حركات`:"";list.innerHTML=top.length?top.map(a=>`<div class="activity"><div class="actico ${a.type}">${a.type==="receive"?"📥":"📤"}</div><div class="actmain"><b>${escapeHtml(a.serial)}</b><span>${a.type==="receive"?"تم الاستلام":"تم التسليم"}</span></div><div class="time">${fmt(a.time)}</div></div>`).join(""):`<div class="empty">لا توجد حركات بعد.<br>ابدأ باستلام أول جهاز.</div>`}
+function renderActivity(){
+  const list=$("activityList"),btn=$("toggleActivityBtn"),acts=[];
+  devices.forEach(x=>{
+    if(x.receivedAt)acts.push({type:"receive",serial:x.serial,time:Number(x.receivedAt)});
+    if(x.deliveredAt)acts.push({type:"deliver",serial:x.serial,time:Number(x.deliveredAt)});
+  });
+  acts.sort((a,b)=>b.time-a.time);
+  const shown=showAllActivities?acts:acts.slice(0,5);
+  if(btn){
+    btn.style.display=acts.length>5?"inline-block":"none";
+    btn.textContent=showAllActivities?"عرض آخر 5":"عرض كل العمليات";
+  }
+  list.innerHTML=shown.length?shown.map(a=>`<div class="activity"><div class="actico ${a.type}">${a.type==="receive"?"📥":"📤"}</div><div class="actmain"><b>${escapeHtml(a.serial)}</b><span>${a.type==="receive"?"استلام جهاز":"تسليم جهاز"}</span></div><div class="time">${fmt(a.time)}</div></div>`).join(""):`<div class="empty">لا توجد عمليات بعد.<br>ابدأ باستلام أول جهاز.</div>`;
+}
 function renderInventory(){let arr=[...devices].sort((a,b)=>Number(b.receivedAt||0)-Number(a.receivedAt||0));if(currentFilter!=="all")arr=arr.filter(x=>x.status===currentFilter);if(searchTerm)arr=arr.filter(x=>x.serial.includes(searchTerm));$("deviceList").innerHTML=arr.length?arr.map(x=>`<div class="device"><div class="box">📦</div><div class="main"><b>${escapeHtml(x.serial)}</b><small>${MODEL}</small><br><span class="pill ${x.status}">${x.status==="stock"?"متبقي":"تم التسليم"}</span></div><button class="trash" onclick="deleteDevice('${escapeHtml(x.serial)}')">🗑</button></div>`).join(""):`<div class="card empty">لا توجد أجهزة مطابقة.</div>`}
 window.deleteDevice=serial=>{const d=devices.find(x=>x.serial===serial);if(!d)return;if(confirm(`حذف ${serial} نهائيًا من بيانات التطبيق؟`)){devices=devices.filter(x=>x.serial!==serial);save();render();toast("تم حذف الجهاز")}}
 
@@ -180,6 +195,7 @@ $("manualBtn").onclick=()=>{unlockAudio();if(processSerial($("manualInput").valu
 $("searchInput").oninput=e=>{searchTerm=normalize(e.target.value);renderInventory()};document.querySelectorAll("[data-filter]").forEach(b=>b.onclick=()=>{currentFilter=b.dataset.filter;document.querySelectorAll("[data-filter]").forEach(x=>x.classList.toggle("active",x===b));renderInventory()});
 
 async function copyReport(){const txt=`سلمت ${delivered().length} جهاز\nمتبقي ${stock().length} جهاز`;try{await navigator.clipboard.writeText(txt);toast("تم نسخ الرسالة للقروب");successFeedback()}catch{toast("تعذر النسخ")}}
+$("toggleActivityBtn").onclick=()=>{showAllActivities=!showAllActivities;renderActivity();};
 $("copyReport").onclick=copyReport;$("copyReportHome").onclick=copyReport;
 $("copyStock").onclick=async()=>{const a=stock();if(!a.length){toast("لا توجد أجهزة متبقية");return}try{await navigator.clipboard.writeText(a.map(x=>x.serial).join("\n"));toast("تم نسخ سيريالات المتبقي")}catch{toast("تعذر النسخ")}};
 $("excelBtn").onclick=()=>{if(!devices.length){toast("لا توجد بيانات");return}const rows=devices.map((d,i)=>`<tr><td>${i+1}</td><td>${MODEL}</td><td style="mso-number-format:'\\@'">${d.serial}</td><td>${d.status==="stock"?"متبقي":"تم التسليم"}</td><td>${fmt(d.receivedAt)}</td><td>${fmt(d.deliveredAt)}</td></tr>`).join("");const html=`<!doctype html><html><head><meta charset="utf-8"></head><body><table border="1"><tr><th>#</th><th>نوع الجهاز</th><th>Serial Number</th><th>الحالة</th><th>تاريخ الاستلام</th><th>تاريخ التسليم</th></tr>${rows}</table></body></html>`;const blob=new Blob(["\ufeff",html],{type:"application/vnd.ms-excel;charset=utf-8"}),url=URL.createObjectURL(blob),a=document.createElement("a");a.href=url;a.download=`N950_Inventory_${new Date().toISOString().slice(0,10)}.xls`;a.click();setTimeout(()=>URL.revokeObjectURL(url),1000);toast("تم إنشاء ملف Excel")};
