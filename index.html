@@ -37,6 +37,7 @@
     .toast{position:fixed;z-index:100;left:50%;bottom:100px;transform:translateX(-50%) translateY(20px);background:#172229;color:#fff;border-radius:14px;padding:11px 15px;font-size:12px;opacity:0;pointer-events:none;transition:.22s;max-width:88%;text-align:center}.toast.show{opacity:1;transform:translateX(-50%) translateY(0)}.flash{position:fixed;inset:0;pointer-events:none;z-index:99;opacity:0}.flash.ok{animation:greenFlash .45s}.flash.bad{animation:redFlash .55s}@keyframes greenFlash{50%{opacity:1;box-shadow:inset 0 0 0 9px #22c55eee}}@keyframes redFlash{50%{opacity:1;box-shadow:inset 0 0 0 9px #ef4444ee}}
     @media(max-width:380px){.stats{gap:6px}.stat{padding:11px 5px}.stat strong{font-size:22px}.quick button{min-height:116px;padding:13px}.quick b{font-size:15px}}
   </style>
+  <script src="https://unpkg.com/@zxing/browser@0.2.1"></script>
 </head>
 <body>
 <div class="app">
@@ -126,7 +127,7 @@ let devices=loadDevices();
 let currentFilter="all",searchTerm="";
 let showAllActivities=false;
 let mode=localStorage.getItem(MODE_KEY)==="deliver"?"deliver":"receive";
-let stream=null,videoTrack=null,detector=null,scanning=false,scanFrame=null,activeSeen="",lastSeenAt=0,torchOn=false,audioCtx=null;
+let stream=null,videoTrack=null,detector=null,zxingReader=null,zxingControls=null,zxingResetTimer=null,scanEngine="",scanning=false,scanFrame=null,activeSeen="",lastSeenAt=0,torchOn=false,audioCtx=null;
 
 function loadDevices(){try{const a=JSON.parse(localStorage.getItem(STORAGE_KEY)||"[]");return Array.isArray(a)?a.filter(x=>x&&SERIAL_RE.test(String(x.serial||""))):[]}catch{return[]}}
 function save(){localStorage.setItem(STORAGE_KEY,JSON.stringify(devices))}
@@ -179,12 +180,126 @@ function processSerial(raw){const serial=normalize(raw);if(!SERIAL_RE.test(seria
 }
 function setMode(m){mode=m;localStorage.setItem(MODE_KEY,m);$("receiveMode").classList.toggle("active",m==="receive");$("deliverMode").classList.toggle("active",m==="deliver");$("manualBtn").textContent=m==="receive"?"استلام":"تسليم";setStatus(m==="receive"?"وضع الاستلام: امسح أجهزة الدفعة الجديدة.":"وضع التسليم: امسح الأجهزة التي أعطيتها للعميل.")}
 
-async function startCamera(){unlockAudio();if(!navigator.mediaDevices?.getUserMedia){setStatus("المتصفح لا يدعم الكاميرا","bad");return}if(!("BarcodeDetector" in window)){setStatus("ماسح الباركود غير مدعوم هنا. استخدم Chrome على Android أو الإدخال اليدوي.","bad");return}
-  try{const supported=await BarcodeDetector.getSupportedFormats();const wanted=["code_128","code_39","ean_13","ean_8","itf","codabar"].filter(x=>supported.includes(x));detector=new BarcodeDetector({formats:wanted.length?wanted:supported});stream=await navigator.mediaDevices.getUserMedia({video:{facingMode:{ideal:"environment"},width:{ideal:2560},height:{ideal:1440},frameRate:{ideal:30,max:30}},audio:false});$("video").srcObject=stream;await $("video").play();videoTrack=stream.getVideoTracks()[0]||null;await optimizeCamera();scanning=true;$("startCam").disabled=true;$("stopCam").disabled=false;$("camMsg").style.display="none";$("scanBox").style.display="block";$("scanLine").style.display="block";$("camTools").style.display="grid";setStatus("📷 ابعد الجوال قليلًا واستخدم التكبير بدل تقريب العدسة.");scanLoop()}catch(e){console.error(e);setStatus("❌ تعذر تشغيل الكاميرا. تأكد من السماح بالإذن.","bad")}}
+async function startCamera(){
+  unlockAudio();
+  if(!navigator.mediaDevices?.getUserMedia){setStatus("المتصفح لا يدعم الكاميرا","bad");return}
+
+  try{
+    stream=await navigator.mediaDevices.getUserMedia({
+      video:{
+        facingMode:{ideal:"environment"},
+        width:{ideal:2560},
+        height:{ideal:1440},
+        frameRate:{ideal:30,max:30}
+      },
+      audio:false
+    });
+
+    $("video").srcObject=stream;
+    await $("video").play();
+    videoTrack=stream.getVideoTracks()[0]||null;
+    await optimizeCamera();
+
+    scanning=true;
+    $("startCam").disabled=true;
+    $("stopCam").disabled=false;
+    $("camMsg").style.display="none";
+    $("scanBox").style.display="block";
+    $("scanLine").style.display="block";
+    $("camTools").style.display="grid";
+
+    // Android/Chrome: نستخدم BarcodeDetector لأنه الأسرع على الأجهزة التي تدعمه.
+    if("BarcodeDetector" in window){
+      const supported=await BarcodeDetector.getSupportedFormats();
+      const wanted=["code_128","code_39","ean_13","ean_8","itf","codabar"].filter(x=>supported.includes(x));
+      detector=new BarcodeDetector({formats:wanted.length?wanted:supported});
+      scanEngine="native";
+      setStatus("📷 الماسح جاهز — Android/Chrome");
+      scanLoop();
+      return;
+    }
+
+    // iPhone/Safari fallback: ZXing يعمل بدون BarcodeDetector.
+    if(window.ZXingBrowser?.BrowserMultiFormatReader){
+      scanEngine="zxing";
+      zxingReader=new ZXingBrowser.BrowserMultiFormatReader();
+      zxingControls=await zxingReader.decodeFromStream(stream,$("video"),(result,error)=>{
+        if(!scanning||!result)return;
+        const raw=typeof result.getText==="function"?result.getText():(result.text||String(result));
+        const v=normalize(raw);
+        if(!SERIAL_RE.test(v))return;
+        const now=Date.now();
+        lastSeenAt=now;
+        if(v===activeSeen)return;
+        activeSeen=v;
+        processSerial(v);
+      });
+      zxingResetTimer=setInterval(()=>{
+        if(activeSeen&&Date.now()-lastSeenAt>1000)activeSeen="";
+      },250);
+      setStatus("📷 الماسح جاهز — iPhone / Safari");
+      return;
+    }
+
+    throw new Error("Barcode scanner library unavailable");
+
+  }catch(e){
+    console.error(e);
+    stopCamera();
+    setStatus("❌ تعذر تشغيل الماسح. تأكد من إذن الكاميرا واتصال الإنترنت ثم حاول مرة أخرى.","bad");
+  }
+}
+
 async function optimizeCamera(){if(!videoTrack)return;let c={};try{c=videoTrack.getCapabilities?.()||{}}catch{}const adv=[];if(Array.isArray(c.focusMode)&&c.focusMode.includes("continuous"))adv.push({focusMode:"continuous"});if(Array.isArray(c.exposureMode)&&c.exposureMode.includes("continuous"))adv.push({exposureMode:"continuous"});if(Array.isArray(c.whiteBalanceMode)&&c.whiteBalanceMode.includes("continuous"))adv.push({whiteBalanceMode:"continuous"});if(adv.length)try{await videoTrack.applyConstraints({advanced:adv})}catch{}if(c.zoom&&Number.isFinite(c.zoom.min)&&Number.isFinite(c.zoom.max)){const z=Math.min(c.zoom.max,Math.max(c.zoom.min,2));$("zoomSlider").min=c.zoom.min;$("zoomSlider").max=c.zoom.max;$("zoomSlider").step=c.zoom.step||.1;$("zoomSlider").value=z;$("zoomValue").textContent=z.toFixed(1)+"×";$("zoomWrap").style.display="block";try{await videoTrack.applyConstraints({advanced:[{zoom:z}]})}catch{}}else $("zoomWrap").style.display="none";$("torchBtn").style.display=c.torch===true?"block":"none"}
-async function refocus(){if(!videoTrack)return;try{const c=videoTrack.getCapabilities?.()||{};if(Array.isArray(c.focusMode)&&c.focusMode.includes("continuous")){await videoTrack.applyConstraints({advanced:[{focusMode:"continuous"}]});setStatus("🎯 تم تحسين التركيز. ثبّت الجوال لحظة.","ok")}else setStatus("ابتعد قليلًا عن الباركود حتى يضبط التركيز.")}catch{}}
-function stopCamera(){scanning=false;if(scanFrame)cancelAnimationFrame(scanFrame);scanFrame=null;if(stream){stream.getTracks().forEach(t=>t.stop());stream=null}$("video").srcObject=null;videoTrack=null;torchOn=false;$("camTools").style.display="none";$("zoomWrap").style.display="none";$("torchBtn").style.display="none";$("torchBtn").textContent="🔦 الفلاش";$("startCam").disabled=false;$("stopCam").disabled=true;$("camMsg").style.display="flex";$("scanBox").style.display="none";$("scanLine").style.display="none";activeSeen=""}
-async function scanLoop(){if(!scanning)return;try{if($("video").readyState>=2&&detector){const codes=await detector.detect($("video")),now=Date.now();let saw=false;for(const c of codes){const v=normalize(c.rawValue);if(!SERIAL_RE.test(v))continue;saw=true;lastSeenAt=now;if(v===activeSeen)break;activeSeen=v;processSerial(v);break}if(!saw&&activeSeen&&now-lastSeenAt>900)activeSeen=""}}catch{}scanFrame=requestAnimationFrame(scanLoop)}
+
+async function refocus(){if(!videoTrack)return;try{const c=videoTrack.getCapabilities?.()||{};if(Array.isArray(c.focusMode)&&c.focusMode.includes("continuous")){await videoTrack.applyConstraints({advanced:[{focusMode:"continuous"}]});setStatus("🎯 تم تحسين التركيز. ثبّت الجوال لحظة.","ok")}else setStatus("ابتعد قليلًا عن الباركود حتى يضبط التركيز.")}catch{setStatus("التركيز التلقائي شغال حسب دعم كاميرا جهازك.")}}
+
+function stopCamera(){
+  scanning=false;
+  if(scanFrame)cancelAnimationFrame(scanFrame);
+  scanFrame=null;
+  if(zxingResetTimer){clearInterval(zxingResetTimer);zxingResetTimer=null}
+  if(zxingControls){try{zxingControls.stop()}catch{}zxingControls=null}
+  zxingReader=null;
+  detector=null;
+  scanEngine="";
+  if(stream){try{stream.getTracks().forEach(t=>t.stop())}catch{}stream=null}
+  $("video").srcObject=null;
+  videoTrack=null;
+  torchOn=false;
+  $("camTools").style.display="none";
+  $("zoomWrap").style.display="none";
+  $("torchBtn").style.display="none";
+  $("torchBtn").textContent="🔦 الفلاش";
+  $("startCam").disabled=false;
+  $("stopCam").disabled=true;
+  $("camMsg").style.display="flex";
+  $("scanBox").style.display="none";
+  $("scanLine").style.display="none";
+  activeSeen="";
+}
+
+async function scanLoop(){
+  if(!scanning||scanEngine!=="native")return;
+  try{
+    if($("video").readyState>=2&&detector){
+      const codes=await detector.detect($("video")),now=Date.now();
+      let saw=false;
+      for(const c of codes){
+        const v=normalize(c.rawValue);
+        if(!SERIAL_RE.test(v))continue;
+        saw=true;
+        lastSeenAt=now;
+        if(v===activeSeen)break;
+        activeSeen=v;
+        processSerial(v);
+        break;
+      }
+      if(!saw&&activeSeen&&now-lastSeenAt>900)activeSeen="";
+    }
+  }catch{}
+  scanFrame=requestAnimationFrame(scanLoop);
+}
 
 function showPage(id){localStorage.setItem(LAST_PAGE_KEY,id);document.querySelectorAll(".page").forEach(p=>p.classList.toggle("active",p.id===id));document.querySelectorAll(".nav").forEach(n=>n.classList.toggle("active",n.dataset.page===id));if(id!=="scan"&&scanning)stopCamera();window.scrollTo({top:0,behavior:"smooth"})}
 document.querySelectorAll(".nav").forEach(b=>b.onclick=()=>showPage(b.dataset.page));
