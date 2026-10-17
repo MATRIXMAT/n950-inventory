@@ -112,13 +112,27 @@
   </section>
 
   <section class="card">
-    <div class="section-title">📋 رسالة المدير</div>
+    <div class="section-title">📋 رسالة المشرف</div>
     <div class="report-box"><div class="report-text" id="reportText">سلمت 0 جهاز\nمتبقي 0 جهاز</div></div>
     <div class="toolbar">
       <button class="purple" id="copyReportBtn">📋 نسخ الرسالة</button>
       <button class="amber" id="resetDeliveredBtn">🔄 تصفير عداد التسليم</button>
     </div>
-    <div class="hint">تصفير عداد التسليم لا يحذف المخزون. فقط يبدأ عدّ «سلمت» من جديد للمرة القادمة التي يسألك فيها المدير.</div>
+    <div class="hint">تصفير عداد التسليم لا يحذف المخزون. فقط يبدأ عدّ «سلمت» من جديد للمرة القادمة التي يسألك فيها المشرف.</div>
+  </section>
+
+
+  <section class="card">
+    <div class="section-title">🛡️ النسخ الاحتياطي</div>
+    <div class="toolbar">
+      <button class="purple" id="backupBtn">⬇️ حفظ نسخة احتياطية</button>
+      <button class="secondary" id="restoreBtn">⬆️ استعادة نسخة</button>
+    </div>
+    <input id="restoreFile" type="file" accept=".json,application/json" style="display:none">
+    <div class="hint">
+      النسخة الاحتياطية تحفظ كل السيريالات، حالة كل جهاز، تواريخ الاستلام والتسليم، وعداد «سلمت».
+      احفظ الملف في مكان آمن مثل ملفات الجوال أو Google Drive.
+    </div>
   </section>
 
   <section class="card">
@@ -142,7 +156,7 @@
     <button class="secondary install" id="installBtn">📲 تثبيت التطبيق على الجوال</button>
   </section>
 
-  <div class="footer-note">البيانات محفوظة على هذا الجوال فقط، لذلك زملاؤك إذا فتحوا نفس الرابط لن يروا مخزونك. لا تمسح بيانات Chrome قبل أخذ نسخة من Excel.</div>
+  <div class="footer-note">البيانات محفوظة على هذا الجوال فقط، لذلك زملاؤك إذا فتحوا نفس الرابط لن يروا مخزونك. خذ نسخة احتياطية بشكل دوري، خصوصًا قبل تغيير الجوال أو مسح بيانات Chrome.</div>
 </main>
 
 <script>
@@ -303,6 +317,98 @@ $("filterStock").onclick=()=>setFilter("stock");$("filterDelivered").onclick=()=
 $("copyStockBtn").onclick=async()=>{const list=stockDevices();if(!list.length){setStatus("لا توجد أجهزة متبقية للنسخ.","warn");return}try{await navigator.clipboard.writeText(list.map(x=>x.serial).join("\n"));setStatus("✅ تم نسخ سيريالات المتبقي.","ok")}catch{setStatus("تعذر النسخ.","bad")}};
 function esc(s){return String(s).replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]))}
 $("excelBtn").onclick=()=>{if(!devices.length){setStatus("لا توجد بيانات لإنشاء Excel.","bad");return}const rows=devices.map((d,i)=>`<tr><td>${i+1}</td><td>${esc(MODEL)}</td><td style="mso-number-format:'\\@'">${esc(d.serial)}</td><td>${d.status==="stock"?"متبقي":"تم التسليم"}</td><td>${d.receivedAt?new Date(d.receivedAt).toLocaleString("ar-SA"):""}</td><td>${d.deliveredAt?new Date(d.deliveredAt).toLocaleString("ar-SA"):""}</td></tr>`).join("");const html=`<!doctype html><html><head><meta charset="utf-8"></head><body><table border="1"><tr><th>#</th><th>نوع الجهاز</th><th>Serial Number</th><th>الحالة</th><th>تاريخ الاستلام</th><th>تاريخ التسليم</th></tr>${rows}</table></body></html>`;const blob=new Blob(["\ufeff",html],{type:"application/vnd.ms-excel;charset=utf-8"}),url=URL.createObjectURL(blob),a=document.createElement("a");a.href=url;a.download=`N950_Inventory_${new Date().toISOString().slice(0,10)}.xls`;document.body.appendChild(a);a.click();a.remove();setTimeout(()=>URL.revokeObjectURL(url),1000);setStatus("✅ تم إنشاء ملف Excel.","ok")};
+
+
+function downloadBackup(){
+  const payload = {
+    app: "n950-inventory",
+    version: 1,
+    model: MODEL,
+    exportedAt: new Date().toISOString(),
+    reportResetAt,
+    devices: devices.map(d => ({
+      model: d.model || MODEL,
+      serial: normalizeSerial(d.serial),
+      status: d.status,
+      receivedAt: d.receivedAt || null,
+      deliveredAt: d.deliveredAt || null
+    }))
+  };
+
+  const blob = new Blob([JSON.stringify(payload, null, 2)], {type:"application/json;charset=utf-8"});
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement("a");
+  const stamp = new Date().toISOString().replace(/[:.]/g,"-").slice(0,19);
+  a.href = url;
+  a.download = `N950_Backup_${stamp}.json`;
+  document.body.appendChild(a);
+  a.click();
+  a.remove();
+  setTimeout(()=>URL.revokeObjectURL(url),1000);
+  setStatus(`✅ تم حفظ نسخة احتياطية تحتوي ${devices.length} جهاز.`,"ok");
+  successFeedback();
+}
+
+function validateBackup(data){
+  if(!data || typeof data !== "object") throw new Error("الملف غير صالح.");
+  if(data.app !== "n950-inventory") throw new Error("هذا الملف ليس نسخة احتياطية لنظام مخزون N950.");
+  if(!Array.isArray(data.devices)) throw new Error("قائمة الأجهزة غير موجودة في النسخة.");
+
+  const cleaned = [];
+  const seen = new Set();
+  for(const item of data.devices){
+    const serial = normalizeSerial(item?.serial);
+    if(!SERIAL_RE.test(serial)) throw new Error(`يوجد سيريال غير صالح داخل النسخة: ${serial || "فارغ"}`);
+    if(seen.has(serial)) throw new Error(`يوجد سيريال مكرر داخل النسخة: ${serial}`);
+    seen.add(serial);
+    const status = item?.status === "delivered" ? "delivered" : item?.status === "stock" ? "stock" : null;
+    if(!status) throw new Error(`حالة الجهاز غير صالحة: ${serial}`);
+    cleaned.push({
+      model: MODEL,
+      serial,
+      status,
+      receivedAt: item?.receivedAt || null,
+      deliveredAt: status === "delivered" ? (item?.deliveredAt || null) : null
+    });
+  }
+  return {devices: cleaned, reportResetAt: Number(data.reportResetAt || 0)};
+}
+
+async function restoreBackupFile(file){
+  if(!file) return;
+  try{
+    const raw = await file.text();
+    const parsed = JSON.parse(raw);
+    const restored = validateBackup(parsed);
+    const stockCount = restored.devices.filter(d=>d.status==="stock").length;
+    const deliveredCount = restored.devices.filter(d=>d.status==="delivered").length;
+    const ok = confirm(
+      `استعادة النسخة الاحتياطية؟\n\n` +
+      `إجمالي الأجهزة: ${restored.devices.length}\n` +
+      `المتبقي: ${stockCount}\n` +
+      `تم التسليم: ${deliveredCount}\n\n` +
+      `تنبيه: سيتم استبدال البيانات الموجودة حاليًا على هذا الجوال بهذه النسخة.`
+    );
+    if(!ok) return;
+    devices = restored.devices;
+    reportResetAt = restored.reportResetAt;
+    saveDevices();
+    localStorage.setItem(RESET_KEY, String(reportResetAt));
+    render();
+    setStatus(`✅ تمت استعادة النسخة بنجاح: ${devices.length} جهاز.`,"ok");
+    successFeedback();
+  }catch(err){
+    console.error(err);
+    setStatus("❌ تعذر استعادة النسخة: " + (err?.message || "ملف غير صالح"),"bad");
+    errorFeedback();
+  }finally{
+    $("restoreFile").value = "";
+  }
+}
+
+$("backupBtn").onclick = downloadBackup;
+$("restoreBtn").onclick = () => $("restoreFile").click();
+$("restoreFile").onchange = e => restoreBackupFile(e.target.files?.[0]);
 
 let deferredPrompt=null;const installBtn=$("installBtn");window.addEventListener("beforeinstallprompt",e=>{e.preventDefault();deferredPrompt=e;installBtn.style.display="block"});installBtn.onclick=async()=>{if(!deferredPrompt)return;deferredPrompt.prompt();await deferredPrompt.userChoice;deferredPrompt=null;installBtn.style.display="none"};
 window.addEventListener("beforeunload",stopCamera);if("serviceWorker" in navigator)window.addEventListener("load",()=>navigator.serviceWorker.register("sw.js"));
