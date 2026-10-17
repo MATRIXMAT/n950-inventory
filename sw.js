@@ -1,4 +1,4 @@
-const CACHE = "n950-inventory-modern-v5";
+const CACHE = "n950-inventory-modern-v6";
 
 const STATIC = [
   "./",
