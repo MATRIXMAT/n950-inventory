@@ -1,4 +1,4 @@
-const CACHE = "n950-inventory-v2";
+const CACHE = "n950-inventory-v3";
 const STATIC = ["./", "index.html", "manifest.webmanifest", "icon-192.png", "icon-512.png"];
 
 self.addEventListener("install", event => {
