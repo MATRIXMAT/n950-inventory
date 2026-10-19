@@ -1,327 +1,4119 @@
 <!doctype html>
 <html lang="ar" dir="rtl">
+
 <head>
-  <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
-  <meta name="theme-color" content="#10b981">
-  <meta name="apple-mobile-web-app-capable" content="yes">
-  <meta name="mobile-web-app-capable" content="yes">
-  <title>NeoLeap Inventory</title>
-  <link rel="manifest" href="manifest.webmanifest">
-  <style>
-    *{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
-    :root{--bg:#f4f7f8;--card:#fff;--line:#e6ecef;--text:#162126;--muted:#73818a;--green:#10b981;--green2:#059669;--greenSoft:#eafaf4;--blue:#3b82f6;--blueSoft:#edf5ff;--purple:#8b5cf6;--purpleSoft:#f3efff;--red:#ef4444;--redSoft:#fff0f0;--shadow:0 10px 30px rgba(15,23,42,.07)}
-    html,body{margin:0;min-height:100%;background:var(--bg);font-family:system-ui,-apple-system,"Segoe UI",Tahoma,Arial,sans-serif;color:var(--text)}
-    body{padding-bottom:calc(82px + env(safe-area-inset-bottom))}
-    button,input{font:inherit}button{cursor:pointer;border:0}.app{max-width:620px;margin:auto;min-height:100vh}
-    .topbar{position:sticky;top:0;z-index:50;display:flex;align-items:center;justify-content:space-between;padding:10px 15px;background:rgba(248,252,251,.94);backdrop-filter:blur(14px);border-bottom:1px solid rgba(230,236,239,.8)}
-    .brand{display:flex;align-items:center;gap:10px}.brand img{width:46px;height:46px;border-radius:15px;object-fit:cover}.brand b{display:block;font-size:15px}.brand span{display:block;color:var(--muted);font-size:11px;margin-top:2px}
-    .round{width:42px;height:42px;border-radius:14px;background:#fff;border:1px solid var(--line);display:grid;place-items:center;font-size:19px}
-    .page{display:none;padding:16px}.page.active{display:block}.title{font-size:25px;font-weight:950;margin:4px 0}.subtitle{font-size:13px;color:var(--muted);line-height:1.65;margin-bottom:14px}
-    .hero{position:relative;overflow:hidden;background:linear-gradient(135deg,#fff,#ebfbf5);border:1px solid #d9f2e8;border-radius:27px;padding:20px;box-shadow:var(--shadow)}
-    .hero:after{content:"";position:absolute;width:150px;height:150px;background:#10b98114;border-radius:50%;left:-55px;top:-65px}.hero .chip{display:inline-block;background:#fff;border:1px solid #d7f0e5;color:#07865f;padding:7px 10px;border-radius:999px;font-size:11px;font-weight:850}.hero h1{font-size:24px;margin:12px 0 6px}.hero p{margin:0;color:var(--muted);font-size:13px;line-height:1.7}
-    .stats{display:grid;grid-template-columns:repeat(3,1fr);gap:9px;margin:13px 0}.stat{background:#fff;border:1px solid var(--line);border-radius:20px;padding:13px 7px;text-align:center;box-shadow:0 4px 14px rgba(15,23,42,.045)}.stat .ico{width:37px;height:37px;margin:0 auto 8px;border-radius:13px;display:grid;place-items:center;font-size:19px}.stat.stock .ico{background:var(--greenSoft)}.stat.delivered .ico{background:var(--blueSoft)}.stat.total .ico{background:var(--purpleSoft)}.stat strong{display:block;font-size:26px}.stat span{font-size:11px;color:var(--muted);font-weight:750}
-    .section-head{display:flex;justify-content:space-between;align-items:center;margin:18px 2px 9px}.section-head h2{margin:0;font-size:17px}.section-head span{font-size:11px;color:var(--muted)}
-    .activity-toggle{background:var(--greenSoft);color:#07865f;border:1px solid #ccefe2;border-radius:999px;padding:7px 11px;font-size:11px;font-weight:900}.activity-toggle:active{transform:scale(.98)}
-.quick{display:grid;grid-template-columns:1fr 1fr;gap:10px}.quick button{min-height:124px;border-radius:23px;text-align:right;padding:15px;border:1px solid var(--line);box-shadow:0 6px 18px rgba(15,23,42,.05)}.quick .receive{background:linear-gradient(145deg,#fff,#edfdf7);color:#123a2f}.quick .deliver{background:linear-gradient(145deg,#fff,#eff6ff);color:#17365c}.qico{width:46px;height:46px;border-radius:15px;display:grid;place-items:center;font-size:23px;margin-bottom:13px}.receive .qico{background:#dff8ef}.deliver .qico{background:#e4f0ff}.quick b{display:block;font-size:17px}.quick small{display:block;margin-top:5px;color:var(--muted);line-height:1.5}
-    .card{background:#fff;border:1px solid var(--line);border-radius:23px;padding:15px;box-shadow:0 5px 19px rgba(15,23,42,.05);margin-bottom:11px}.report-card{background:linear-gradient(135deg,#0f9f74,#10b981);color:#fff;border:0}.report-values{display:flex;gap:26px;margin:11px 0 14px}.report-values strong{font-size:27px}.report-values span{font-size:12px;opacity:.9;margin-right:5px}.white-btn{width:100%;padding:12px;border-radius:14px;background:#fff;color:#087e5c;font-weight:900}
-    .activity{display:flex;align-items:center;gap:10px;padding:10px 0;border-bottom:1px solid #f0f3f4}.activity:last-child{border-bottom:0}.actico{width:37px;height:37px;border-radius:12px;display:grid;place-items:center;flex:none}.actico.receive{background:var(--greenSoft)}.actico.deliver{background:var(--blueSoft)}.actmain{flex:1;min-width:0}.actmain b{display:block;direction:ltr;text-align:right;font-size:13px}.actmain span,.time{font-size:11px;color:var(--muted)}.empty{text-align:center;color:var(--muted);padding:22px 8px;font-size:13px}
-    .search{width:100%;border:1px solid var(--line);background:#fff;border-radius:15px;padding:13px;outline:none}.search:focus{border-color:#8dddc1;box-shadow:0 0 0 3px #10b98112}.segments{display:flex;background:#e9eef1;padding:4px;border-radius:14px;gap:4px;margin:10px 0}.segments button{flex:1;padding:9px 4px;border-radius:11px;background:transparent;color:#68757d;font-weight:850;font-size:12px}.segments button.active{background:#fff;color:#0b8e67;box-shadow:0 2px 8px #0000000f}
-    .device-list{display:flex;flex-direction:column;gap:9px}.device{display:flex;align-items:center;gap:10px;background:#fff;border:1px solid var(--line);border-radius:17px;padding:11px}.device .box{width:44px;height:44px;border-radius:14px;background:#effaf6;display:grid;place-items:center;font-size:21px}.device .main{flex:1;min-width:0}.device .main b{display:block;direction:ltr;text-align:right;font-size:13px}.device .main small{color:var(--muted);font-size:11px}.pill{display:inline-block;margin-top:5px;border-radius:999px;padding:4px 8px;font-size:10px;font-weight:850}.pill.stock{background:var(--greenSoft);color:#07865f}.pill.delivered{background:var(--blueSoft);color:#286cc4}.trash{width:35px;height:35px;border-radius:11px;background:var(--redSoft);color:var(--red)}
-    .mode{display:grid;grid-template-columns:1fr 1fr;gap:9px;margin-bottom:11px}.mode button{padding:13px;border:1.5px solid var(--line);border-radius:15px;background:#fff;font-weight:900;color:#66747c}.mode .receive.active{background:var(--greenSoft);border-color:#8bdec0;color:#07865f}.mode .deliver.active{background:var(--blueSoft);border-color:#add1ff;color:#286cc4}
-    .camera-card{padding:9px}.camera{position:relative;aspect-ratio:4/3;background:#0e171c;border-radius:19px;overflow:hidden}.camera video{width:100%;height:100%;object-fit:cover}.cammsg{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;text-align:center;color:#cdd4d8;padding:25px;background:linear-gradient(145deg,#132229,#0e1519);line-height:1.7}.scanbox{position:absolute;left:8%;right:8%;top:35%;height:28%;border:3px solid #31d5a3;border-radius:16px;box-shadow:0 0 0 9999px #00000040;display:none}.scanline{position:absolute;left:12%;right:12%;top:49%;height:2px;background:#31d5a3;box-shadow:0 0 13px #31d5a3;display:none;animation:scan 1.6s linear infinite}@keyframes scan{0%{transform:translateY(-42px)}50%{transform:translateY(42px)}100%{transform:translateY(-42px)}}
-    .row{display:grid;grid-template-columns:1fr 1fr;gap:9px;margin-top:10px}.btn{padding:12px;border-radius:14px;font-weight:900}.btn.primary{background:var(--green);color:#fff}.btn.secondary{background:#eef2f4;color:#46545d}.btn.blue{background:var(--blue);color:#fff}.btn.red{background:var(--redSoft);color:var(--red)}.btn:disabled{opacity:.5}.tools{display:none;grid-template-columns:1fr 1fr;gap:9px;margin-top:9px}.zoom{display:none;margin-top:9px;background:#f5f8f9;border-radius:14px;padding:10px}.zoomhead{display:flex;justify-content:space-between;font-size:12px;color:var(--muted);font-weight:800}.zoom input{width:100%}.status{margin-top:10px;border-radius:14px;padding:11px;font-size:12px;background:#f1f5f7;color:#59676f}.status.ok{background:var(--greenSoft);color:#07865f}.status.bad{background:var(--redSoft);color:#c72c2c}.status.warn{background:#fff7e8;color:#a86205}
-    .manual{display:flex;gap:8px;margin-top:10px}.manual input{flex:1;min-width:0;padding:12px;border:1px solid var(--line);border-radius:13px;direction:ltr;text-transform:uppercase}.manual button{padding:0 16px;border-radius:13px;background:#18242a;color:#fff;font-weight:850}
-    .menu{display:flex;flex-direction:column;overflow:hidden;background:#fff;border:1px solid var(--line);border-radius:22px}.menu button{display:flex;align-items:center;gap:12px;background:#fff;text-align:right;padding:15px;border-bottom:1px solid #eef2f3}.menu button:last-child{border-bottom:0}.menu .mi{width:39px;height:39px;border-radius:12px;background:#eef9f5;display:grid;place-items:center;font-size:19px}.menu .copy{flex:1}.menu .copy b{display:block;font-size:14px}.menu .copy small{display:block;color:var(--muted);margin-top:3px}.menu .arr{color:#a1abb0}.hidden{display:none!important}
-    .bottom{position:fixed;z-index:60;bottom:0;left:50%;transform:translateX(-50%);width:min(620px,100%);display:grid;grid-template-columns:repeat(5,1fr);background:rgba(255,255,255,.97);border-top:1px solid var(--line);padding:7px 5px calc(7px + env(safe-area-inset-bottom));backdrop-filter:blur(15px)}.nav{background:transparent;color:#80909a;display:flex;flex-direction:column;align-items:center;gap:3px;font-size:10px;font-weight:800}.nav i{font-style:normal;font-size:20px}.nav.active{color:var(--green2)}.nav.scan i{width:47px;height:47px;margin-top:-24px;background:var(--green);color:#fff;border:5px solid var(--bg);border-radius:50%;display:grid;place-items:center;font-size:22px;box-sizing:content-box}.nav.scan span{margin-top:-2px}
-    .toast{position:fixed;z-index:100;left:50%;bottom:100px;transform:translateX(-50%) translateY(20px);background:#172229;color:#fff;border-radius:14px;padding:11px 15px;font-size:12px;opacity:0;pointer-events:none;transition:.22s;max-width:88%;text-align:center}.toast.show{opacity:1;transform:translateX(-50%) translateY(0)}.flash{position:fixed;inset:0;pointer-events:none;z-index:99;opacity:0}.flash.ok{animation:greenFlash .45s}.flash.bad{animation:redFlash .55s}@keyframes greenFlash{50%{opacity:1;box-shadow:inset 0 0 0 9px #22c55eee}}@keyframes redFlash{50%{opacity:1;box-shadow:inset 0 0 0 9px #ef4444ee}}
-    @media(max-width:380px){.stats{gap:6px}.stat{padding:11px 5px}.stat strong{font-size:22px}.quick button{min-height:116px;padding:13px}.quick b{font-size:15px}}
-  </style>
-  <script src="https://unpkg.com/@zxing/browser@0.2.1"></script>
+
+<meta charset="utf-8">
+
+<meta
+  name="viewport"
+  content="width=device-width,initial-scale=1,viewport-fit=cover"
+>
+
+<meta
+  name="theme-color"
+  content="#10b981"
+>
+
+<meta
+  name="apple-mobile-web-app-capable"
+  content="yes"
+>
+
+<meta
+  name="mobile-web-app-capable"
+  content="yes"
+>
+
+<title>NeoLeap Inventory</title>
+
+<link
+  rel="manifest"
+  href="manifest.webmanifest"
+>
+
+<style>
+
+*{
+  box-sizing:border-box;
+  -webkit-tap-highlight-color:transparent
+}
+
+:root{
+  --bg:#f4f7f8;
+  --card:#fff;
+  --line:#e6ecef;
+  --text:#162126;
+  --muted:#73818a;
+  --green:#10b981;
+  --green2:#059669;
+  --greenSoft:#eafaf4;
+  --blue:#3b82f6;
+  --blueSoft:#edf5ff;
+  --purple:#8b5cf6;
+  --purpleSoft:#f3efff;
+  --red:#ef4444;
+  --redSoft:#fff0f0;
+  --shadow:0 10px 30px rgba(15,23,42,.07)
+}
+
+html,
+body{
+  margin:0;
+  min-height:100%;
+  background:var(--bg);
+  font-family:system-ui,-apple-system,"Segoe UI",Tahoma,Arial,sans-serif;
+  color:var(--text)
+}
+
+body{
+  padding-bottom:calc(82px + env(safe-area-inset-bottom))
+}
+
+button,
+input{
+  font:inherit
+}
+
+button{
+  cursor:pointer;
+  border:0
+}
+
+.app{
+  max-width:620px;
+  margin:auto;
+  min-height:100vh
+}
+
+.topbar{
+  position:sticky;
+  top:0;
+  z-index:50;
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  padding:10px 15px;
+  background:rgba(248,252,251,.94);
+  backdrop-filter:blur(14px);
+  border-bottom:1px solid rgba(230,236,239,.8)
+}
+
+.brand{
+  display:flex;
+  align-items:center;
+  gap:10px
+}
+
+.brand img{
+  width:46px;
+  height:46px;
+  border-radius:15px;
+  object-fit:cover
+}
+
+.brand b{
+  display:block;
+  font-size:15px
+}
+
+.brand span{
+  display:block;
+  color:var(--muted);
+  font-size:11px;
+  margin-top:2px
+}
+
+.round{
+  width:42px;
+  height:42px;
+  border-radius:14px;
+  background:#fff;
+  border:1px solid var(--line);
+  display:grid;
+  place-items:center;
+  font-size:19px
+}
+
+.page{
+  display:none;
+  padding:16px
+}
+
+.page.active{
+  display:block
+}
+
+.title{
+  font-size:25px;
+  font-weight:950;
+  margin:4px 0
+}
+
+.subtitle{
+  font-size:13px;
+  color:var(--muted);
+  line-height:1.65;
+  margin-bottom:14px
+}
+
+.hero{
+  position:relative;
+  overflow:hidden;
+  background:linear-gradient(135deg,#fff,#ebfbf5);
+  border:1px solid #d9f2e8;
+  border-radius:27px;
+  padding:20px;
+  box-shadow:var(--shadow)
+}
+
+.hero:after{
+  content:"";
+  position:absolute;
+  width:150px;
+  height:150px;
+  background:#10b98114;
+  border-radius:50%;
+  left:-55px;
+  top:-65px
+}
+
+.hero .chip{
+  display:inline-block;
+  background:#fff;
+  border:1px solid #d7f0e5;
+  color:#07865f;
+  padding:7px 10px;
+  border-radius:999px;
+  font-size:11px;
+  font-weight:850
+}
+
+.hero h1{
+  font-size:24px;
+  margin:12px 0 6px
+}
+
+.hero p{
+  margin:0;
+  color:var(--muted);
+  font-size:13px;
+  line-height:1.7
+}
+
+.stats{
+  display:grid;
+  grid-template-columns:repeat(3,1fr);
+  gap:9px;
+  margin:13px 0
+}
+
+.stat{
+  background:#fff;
+  border:1px solid var(--line);
+  border-radius:20px;
+  padding:13px 7px;
+  text-align:center;
+  box-shadow:0 4px 14px rgba(15,23,42,.045)
+}
+
+.stat .ico{
+  width:37px;
+  height:37px;
+  margin:0 auto 8px;
+  border-radius:13px;
+  display:grid;
+  place-items:center;
+  font-size:19px
+}
+
+.stat.stock .ico{
+  background:var(--greenSoft)
+}
+
+.stat.delivered .ico{
+  background:var(--blueSoft)
+}
+
+.stat.total .ico{
+  background:var(--purpleSoft)
+}
+
+.stat strong{
+  display:block;
+  font-size:26px
+}
+
+.stat span{
+  font-size:11px;
+  color:var(--muted);
+  font-weight:750
+}
+
+.section-head{
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  margin:18px 2px 9px
+}
+
+.section-head h2{
+  margin:0;
+  font-size:17px
+}
+
+.section-head span{
+  font-size:11px;
+  color:var(--muted)
+}
+
+.activity-toggle{
+  background:var(--greenSoft);
+  color:#07865f;
+  border:1px solid #ccefe2;
+  border-radius:999px;
+  padding:7px 11px;
+  font-size:11px;
+  font-weight:900
+}
+
+.quick{
+  display:grid;
+  grid-template-columns:1fr 1fr;
+  gap:10px
+}
+
+.quick button{
+  min-height:124px;
+  border-radius:23px;
+  text-align:right;
+  padding:15px;
+  border:1px solid var(--line);
+  box-shadow:0 6px 18px rgba(15,23,42,.05)
+}
+
+.quick .receive{
+  background:linear-gradient(145deg,#fff,#edfdf7);
+  color:#123a2f
+}
+
+.quick .deliver{
+  background:linear-gradient(145deg,#fff,#eff6ff);
+  color:#17365c
+}
+
+.qico{
+  width:46px;
+  height:46px;
+  border-radius:15px;
+  display:grid;
+  place-items:center;
+  font-size:23px;
+  margin-bottom:13px
+}
+
+.receive .qico{
+  background:#dff8ef
+}
+
+.deliver .qico{
+  background:#e4f0ff
+}
+
+.quick b{
+  display:block;
+  font-size:17px
+}
+
+.quick small{
+  display:block;
+  margin-top:5px;
+  color:var(--muted);
+  line-height:1.5
+}
+
+.card{
+  background:#fff;
+  border:1px solid var(--line);
+  border-radius:23px;
+  padding:15px;
+  box-shadow:0 5px 19px rgba(15,23,42,.05);
+  margin-bottom:11px
+}
+
+.report-card{
+  background:linear-gradient(135deg,#0f9f74,#10b981);
+  color:#fff;
+  border:0
+}
+
+.report-values{
+  display:flex;
+  gap:26px;
+  margin:11px 0 14px
+}
+
+.report-values strong{
+  font-size:27px
+}
+
+.report-values span{
+  font-size:12px;
+  opacity:.9;
+  margin-right:5px
+}
+
+.white-btn{
+  width:100%;
+  padding:12px;
+  border-radius:14px;
+  background:#fff;
+  color:#087e5c;
+  font-weight:900
+}
+
+.activity{
+  display:flex;
+  align-items:center;
+  gap:10px;
+  padding:10px 0;
+  border-bottom:1px solid #f0f3f4
+}
+
+.activity:last-child{
+  border-bottom:0
+}
+
+.actico{
+  width:37px;
+  height:37px;
+  border-radius:12px;
+  display:grid;
+  place-items:center;
+  flex:none
+}
+
+.actico.receive{
+  background:var(--greenSoft)
+}
+
+.actico.deliver{
+  background:var(--blueSoft)
+}
+
+.actmain{
+  flex:1;
+  min-width:0
+}
+
+.actmain b{
+  display:block;
+  direction:ltr;
+  text-align:right;
+  font-size:13px
+}
+
+.actmain span,
+.time{
+  font-size:11px;
+  color:var(--muted)
+}
+
+.empty{
+  text-align:center;
+  color:var(--muted);
+  padding:22px 8px;
+  font-size:13px
+}
+
+.search{
+  width:100%;
+  border:1px solid var(--line);
+  background:#fff;
+  border-radius:15px;
+  padding:13px;
+  outline:none
+}
+
+.search:focus{
+  border-color:#8dddc1;
+  box-shadow:0 0 0 3px #10b98112
+}
+
+.segments{
+  display:flex;
+  background:#e9eef1;
+  padding:4px;
+  border-radius:14px;
+  gap:4px;
+  margin:10px 0
+}
+
+.segments button{
+  flex:1;
+  padding:9px 4px;
+  border-radius:11px;
+  background:transparent;
+  color:#68757d;
+  font-weight:850;
+  font-size:12px
+}
+
+.segments button.active{
+  background:#fff;
+  color:#0b8e67;
+  box-shadow:0 2px 8px #0000000f
+}
+
+.device-list{
+  display:flex;
+  flex-direction:column;
+  gap:9px
+}
+
+.device{
+  display:flex;
+  align-items:center;
+  gap:10px;
+  background:#fff;
+  border:1px solid var(--line);
+  border-radius:17px;
+  padding:11px
+}
+
+.device .box{
+  width:44px;
+  height:44px;
+  border-radius:14px;
+  background:#effaf6;
+  display:grid;
+  place-items:center;
+  font-size:21px
+}
+
+.device .main{
+  flex:1;
+  min-width:0
+}
+
+.device .main b{
+  display:block;
+  direction:ltr;
+  text-align:right;
+  font-size:13px
+}
+
+.device .main small{
+  color:var(--muted);
+  font-size:11px
+}
+
+.pill{
+  display:inline-block;
+  margin-top:5px;
+  border-radius:999px;
+  padding:4px 8px;
+  font-size:10px;
+  font-weight:850
+}
+
+.pill.stock{
+  background:var(--greenSoft);
+  color:#07865f
+}
+
+.pill.delivered{
+  background:var(--blueSoft);
+  color:#286cc4
+}
+
+.trash{
+  width:35px;
+  height:35px;
+  border-radius:11px;
+  background:var(--redSoft);
+  color:var(--red)
+}
+
+.mode{
+  display:grid;
+  grid-template-columns:1fr 1fr;
+  gap:9px;
+  margin-bottom:11px
+}
+
+.mode button{
+  padding:13px;
+  border:1.5px solid var(--line);
+  border-radius:15px;
+  background:#fff;
+  font-weight:900;
+  color:#66747c
+}
+
+.mode .receive.active{
+  background:var(--greenSoft);
+  border-color:#8bdec0;
+  color:#07865f
+}
+
+.mode .deliver.active{
+  background:var(--blueSoft);
+  border-color:#add1ff;
+  color:#286cc4
+}
+
+.camera-card{
+  padding:9px
+}
+
+.camera{
+  position:relative;
+  aspect-ratio:4/3;
+  background:#0e171c;
+  border-radius:19px;
+  overflow:hidden
+}
+
+.camera video{
+  width:100%;
+  height:100%;
+  object-fit:cover
+}
+
+.cammsg{
+  position:absolute;
+  inset:0;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  text-align:center;
+  color:#cdd4d8;
+  padding:25px;
+  background:linear-gradient(145deg,#132229,#0e1519);
+  line-height:1.7
+}
+
+.scanbox{
+  position:absolute;
+  left:8%;
+  right:8%;
+  top:35%;
+  height:28%;
+  border:3px solid #31d5a3;
+  border-radius:16px;
+  box-shadow:0 0 0 9999px #00000040;
+  display:none
+}
+
+.scanline{
+  position:absolute;
+  left:12%;
+  right:12%;
+  top:49%;
+  height:2px;
+  background:#31d5a3;
+  box-shadow:0 0 13px #31d5a3;
+  display:none;
+  animation:scan 1.6s linear infinite
+}
+
+@keyframes scan{
+  0%{transform:translateY(-42px)}
+  50%{transform:translateY(42px)}
+  100%{transform:translateY(-42px)}
+}
+
+.row{
+  display:grid;
+  grid-template-columns:1fr 1fr;
+  gap:9px;
+  margin-top:10px
+}
+
+.btn{
+  padding:12px;
+  border-radius:14px;
+  font-weight:900
+}
+
+.btn.primary{
+  background:var(--green);
+  color:#fff
+}
+
+.btn.secondary{
+  background:#eef2f4;
+  color:#46545d
+}
+
+.btn:disabled{
+  opacity:.5
+}
+
+.tools{
+  display:none;
+  grid-template-columns:1fr 1fr;
+  gap:9px;
+  margin-top:9px
+}
+
+.zoom{
+  display:none;
+  margin-top:9px;
+  background:#f5f8f9;
+  border-radius:14px;
+  padding:10px
+}
+
+.zoomhead{
+  display:flex;
+  justify-content:space-between;
+  font-size:12px;
+  color:var(--muted);
+  font-weight:800
+}
+
+.zoom input{
+  width:100%
+}
+
+.status{
+  margin-top:10px;
+  border-radius:14px;
+  padding:11px;
+  font-size:12px;
+  background:#f1f5f7;
+  color:#59676f
+}
+
+.status.ok{
+  background:var(--greenSoft);
+  color:#07865f
+}
+
+.status.bad{
+  background:var(--redSoft);
+  color:#c72c2c
+}
+
+.status.warn{
+  background:#fff7e8;
+  color:#a86205
+}
+
+.manual{
+  display:flex;
+  gap:8px;
+  margin-top:10px
+}
+
+.manual input{
+  flex:1;
+  min-width:0;
+  padding:12px;
+  border:1px solid var(--line);
+  border-radius:13px;
+  direction:ltr;
+  text-transform:uppercase
+}
+
+.manual button{
+  padding:0 16px;
+  border-radius:13px;
+  background:#18242a;
+  color:#fff;
+  font-weight:850
+}
+
+.menu{
+  display:flex;
+  flex-direction:column;
+  overflow:hidden;
+  background:#fff;
+  border:1px solid var(--line);
+  border-radius:22px
+}
+
+.menu button{
+  display:flex;
+  align-items:center;
+  gap:12px;
+  background:#fff;
+  text-align:right;
+  padding:15px;
+  border-bottom:1px solid #eef2f3
+}
+
+.menu button:last-child{
+  border-bottom:0
+}
+
+.menu .mi{
+  width:39px;
+  height:39px;
+  border-radius:12px;
+  background:#eef9f5;
+  display:grid;
+  place-items:center;
+  font-size:19px
+}
+
+.menu .copy{
+  flex:1
+}
+
+.menu .copy b{
+  display:block;
+  font-size:14px
+}
+
+.menu .copy small{
+  display:block;
+  color:var(--muted);
+  margin-top:3px
+}
+
+.hidden{
+  display:none!important
+}
+
+.bottom{
+  position:fixed;
+  z-index:60;
+  bottom:0;
+  left:50%;
+  transform:translateX(-50%);
+  width:min(620px,100%);
+  display:grid;
+  grid-template-columns:repeat(5,1fr);
+  background:rgba(255,255,255,.97);
+  border-top:1px solid var(--line);
+  padding:7px 5px calc(7px + env(safe-area-inset-bottom));
+  backdrop-filter:blur(15px)
+}
+
+.nav{
+  background:transparent;
+  color:#80909a;
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+  gap:3px;
+  font-size:10px;
+  font-weight:800
+}
+
+.nav i{
+  font-style:normal;
+  font-size:20px
+}
+
+.nav.active{
+  color:var(--green2)
+}
+
+.nav.scan i{
+  width:47px;
+  height:47px;
+  margin-top:-24px;
+  background:var(--green);
+  color:#fff;
+  border:5px solid var(--bg);
+  border-radius:50%;
+  display:grid;
+  place-items:center;
+  font-size:22px;
+  box-sizing:content-box
+}
+
+.toast{
+  position:fixed;
+  z-index:100;
+  left:50%;
+  bottom:100px;
+  transform:translateX(-50%) translateY(20px);
+  background:#172229;
+  color:#fff;
+  border-radius:14px;
+  padding:11px 15px;
+  font-size:12px;
+  opacity:0;
+  pointer-events:none;
+  transition:.22s;
+  max-width:88%;
+  text-align:center
+}
+
+.toast.show{
+  opacity:1;
+  transform:translateX(-50%) translateY(0)
+}
+
+.flash{
+  position:fixed;
+  inset:0;
+  pointer-events:none;
+  z-index:99;
+  opacity:0
+}
+
+.flash.ok{
+  animation:greenFlash .45s
+}
+
+.flash.bad{
+  animation:redFlash .55s
+}
+
+@keyframes greenFlash{
+  50%{
+    opacity:1;
+    box-shadow:inset 0 0 0 9px #22c55eee
+  }
+}
+
+@keyframes redFlash{
+  50%{
+    opacity:1;
+    box-shadow:inset 0 0 0 9px #ef4444ee
+  }
+}
+
+</style>
+
+<script src="https://unpkg.com/@zxing/browser@0.2.1"></script>
+
 </head>
+
 <body>
+
 <div class="app">
-  <header class="topbar">
-    <div class="brand"><img src="icon-192.png" alt="NeoLeap"><div><b>NeoLeap Inventory</b><span>Newland N950</span></div></div>
-    <button class="round" id="quickBackup" title="نسخة احتياطية">☁️</button>
-  </header>
 
-  <main>
-    <section class="page active" id="home">
-      <div class="hero"><span class="chip">● جاهز للجرد والمسح</span><h1>مخزونك واضح في لحظة</h1><p>استلم الأجهزة، سلّمها للعملاء، واعرف المتبقي بدون حساب يدوي.</p></div>
-      <div class="stats">
-        <div class="stat stock"><div class="ico">📦</div><strong id="homeStock">0</strong><span>المتبقي</span></div>
-        <div class="stat delivered"><div class="ico">🚚</div><strong id="homeDelivered">0</strong><span>سلمت</span></div>
-        <div class="stat total"><div class="ico">▦</div><strong id="homeTotal">0</strong><span>إجمالي الأجهزة</span></div>
-      </div>
-      <div class="section-head"><h2>العمليات السريعة</h2><span>اختر العملية</span></div>
-      <div class="quick">
-        <button class="receive" id="homeReceive"><span class="qico">📥</span><b>استلام أجهزة</b><small>إضافة دفعة جديدة إلى مخزونك</small></button>
-        <button class="deliver" id="homeDeliver"><span class="qico">📤</span><b>تسليم أجهزة</b><small>امسح الأجهزة التي سلمتها</small></button>
-      </div>
-      <div class="section-head"><h2>تقرير سريع</h2><span>جاهز للقروب</span></div>
-      <div class="card report-card"><div>رسالة المدير</div><div class="report-values"><div><strong id="reportDeliveredHome">0</strong><span>سلمت</span></div><div><strong id="reportStockHome">0</strong><span>متبقي</span></div></div><button class="white-btn" id="copyReportHome">نسخ الرسالة</button></div>
-      <div class="section-head"><h2>آخر العمليات</h2><button class="activity-toggle" id="toggleActivityBtn">عرض كل العمليات</button></div>
-      <div class="card" id="activityList"></div>
-    </section>
+<header class="topbar">
 
-    <section class="page" id="inventory">
-      <div class="title">المخزون</div><div class="subtitle">ابحث عن أي سيريال واعرف هل هو متبقي أو تم تسليمه.</div>
-      <input class="search" id="searchInput" placeholder="ابحث بالسيريال...">
-      <div class="segments"><button class="active" data-filter="all">الكل</button><button data-filter="stock">المتبقي</button><button data-filter="delivered">تم التسليم</button></div>
-      <div class="stats"><div class="stat stock"><strong id="invStock">0</strong><span>متبقي</span></div><div class="stat delivered"><strong id="invDelivered">0</strong><span>تم التسليم</span></div><div class="stat total"><strong id="invTotal">0</strong><span>الإجمالي</span></div></div>
-      <div class="device-list" id="deviceList"></div>
-    </section>
+<div class="brand">
 
-    <section class="page" id="scan">
-      <div class="title">الماسح</div><div class="subtitle">اختر استلام أو تسليم، ثم وجّه الكاميرا إلى باركود SN.</div>
-      <div class="mode"><button class="receive active" id="receiveMode">📥 استلام</button><button class="deliver" id="deliverMode">📤 تسليم</button></div>
-      <div class="card camera-card">
-        <div class="camera"><video id="video" playsinline muted></video><div class="cammsg" id="camMsg">اضغط تشغيل الكاميرا للبدء</div><div class="scanbox" id="scanBox"></div><div class="scanline" id="scanLine"></div></div>
-        <div class="row"><button class="btn primary" id="startCam">📷 تشغيل الكاميرا</button><button class="btn secondary" id="stopCam" disabled>⏹ إيقاف</button></div>
-        <div class="tools" id="camTools"><button class="btn secondary" id="focusBtn">🎯 تحسين التركيز</button><button class="btn secondary" id="torchBtn" style="display:none">🔦 الفلاش</button></div>
-        <div class="zoom" id="zoomWrap"><div class="zoomhead"><span>🔍 التكبير</span><span id="zoomValue">1.0×</span></div><input id="zoomSlider" type="range" min="1" max="1" step=".1" value="1"></div>
-        <div class="status" id="status">جاهز.</div>
-        <div class="manual"><input id="manualInput" placeholder="NCD700280982"><button id="manualBtn">إضافة</button></div>
-      </div>
-    </section>
+<img
+  src="icon-192.png"
+  alt="NeoLeap"
+>
 
-    <section class="page" id="reports">
-      <div class="title">التقرير</div><div class="subtitle">الأرقام التي تحتاجها عندما يسألك المدير عن التسليم والمتبقي.</div>
-      <div class="card report-card"><div>التقرير الحالي</div><div class="report-values"><div><strong id="reportDelivered">0</strong><span>سلمت</span></div><div><strong id="reportStock">0</strong><span>متبقي</span></div></div><button class="white-btn" id="copyReport">نسخ: سلمت / متبقي</button></div>
-      <div class="card"><b>طريقة احتساب «سلمت»</b><p class="subtitle" style="margin:7px 0 0">العدد هنا هو إجمالي الأجهزة التي حالتها «تم التسليم» داخل التطبيق، لذلك يبقى صحيحًا بعد تحديث الصفحة أو إغلاق التطبيق.</p></div>
-      <div class="card"><b>ملف Excel</b><p class="subtitle" style="margin:7px 0 12px">ينشئ قائمة بكل السيريالات وحالتها وتواريخ الاستلام والتسليم.</p><button class="btn secondary" style="width:100%" id="excelBtn">📊 تصدير Excel</button></div>
-    </section>
+<div>
 
-    <section class="page" id="more">
-      <div class="title">المزيد</div><div class="subtitle">النسخ الاحتياطي وإعدادات البيانات.</div>
-      <div class="menu">
-        <button id="backupBtn"><span class="mi">☁️</span><span class="copy"><b>حفظ نسخة احتياطية</b><small>حفظ مخزونك وسجل التسليم على جهازك</small></span><span class="arr">‹</span></button>
-        <button id="restoreBtn"><span class="mi">♻️</span><span class="copy"><b>استعادة نسخة احتياطية</b><small>استرجاع مخزونك من ملف سابق</small></span><span class="arr">‹</span></button>
-        <button id="copyStock"><span class="mi">📋</span><span class="copy"><b>نسخ سيريالات المتبقي</b><small>نسخ كل الأجهزة الموجودة في مخزونك</small></span><span class="arr">‹</span></button>
-        <button id="installBtn" style="display:none"><span class="mi">📱</span><span class="copy"><b>تثبيت التطبيق</b><small>إضافته كتطبيق على الشاشة الرئيسية</small></span><span class="arr">‹</span></button>
-      </div>
-      <input id="restoreFile" type="file" accept=".json,application/json" class="hidden">
-      <div class="card" style="margin-top:12px"><b>مهم</b><p class="subtitle" style="margin:7px 0 0">بيانات كل موظف محفوظة على جواله فقط. فتح نفس الرابط من جوال آخر لا يعرض مخزونك.</p></div>
-    </section>
-  </main>
+<b>
+NeoLeap Inventory
+</b>
+
+<span>
+Newland N950
+</span>
+
 </div>
 
+</div>
+
+<button
+  class="round"
+  id="quickBackup"
+>
+☁️
+</button>
+
+</header>
+
+
+<main>
+
+<section
+  class="page active"
+  id="home"
+>
+
+<div class="hero">
+
+<span class="chip">
+● جاهز للجرد والمسح
+</span>
+
+<h1>
+مخزونك واضح في لحظة
+</h1>
+
+<p>
+استلم الأجهزة، سلّمها للعملاء، واعرف المتبقي بدون حساب يدوي.
+</p>
+
+</div>
+
+
+<div class="stats">
+
+<div class="stat stock">
+
+<div class="ico">
+📦
+</div>
+
+<strong id="homeStock">
+0
+</strong>
+
+<span>
+المتبقي
+</span>
+
+</div>
+
+
+<div class="stat delivered">
+
+<div class="ico">
+🚚
+</div>
+
+<strong id="homeDelivered">
+0
+</strong>
+
+<span>
+سلمت
+</span>
+
+</div>
+
+
+<div class="stat total">
+
+<div class="ico">
+▦
+</div>
+
+<strong id="homeTotal">
+0
+</strong>
+
+<span>
+إجمالي الأجهزة
+</span>
+
+</div>
+
+</div>
+
+
+<div class="section-head">
+
+<h2>
+العمليات السريعة
+</h2>
+
+<span>
+اختر العملية
+</span>
+
+</div>
+
+
+<div class="quick">
+
+<button
+  class="receive"
+  id="homeReceive"
+>
+
+<span class="qico">
+📥
+</span>
+
+<b>
+استلام أجهزة
+</b>
+
+<small>
+إضافة دفعة جديدة إلى مخزونك
+</small>
+
+</button>
+
+
+<button
+  class="deliver"
+  id="homeDeliver"
+>
+
+<span class="qico">
+📤
+</span>
+
+<b>
+تسليم أجهزة
+</b>
+
+<small>
+امسح الأجهزة التي سلمتها
+</small>
+
+</button>
+
+</div>
+
+
+<div class="section-head">
+
+<h2>
+تقرير سريع
+</h2>
+
+<span>
+جاهز للقروب
+</span>
+
+</div>
+
+
+<div class="card report-card">
+
+<div>
+رسالة المدير
+</div>
+
+<div class="report-values">
+
+<div>
+
+<strong id="reportDeliveredHome">
+0
+</strong>
+
+<span>
+سلمت
+</span>
+
+</div>
+
+
+<div>
+
+<strong id="reportStockHome">
+0
+</strong>
+
+<span>
+متبقي
+</span>
+
+</div>
+
+</div>
+
+<button
+  class="white-btn"
+  id="copyReportHome"
+>
+نسخ الرسالة
+</button>
+
+</div>
+
+
+<div class="section-head">
+
+<h2>
+آخر العمليات
+</h2>
+
+<button
+  class="activity-toggle"
+  id="toggleActivityBtn"
+>
+عرض كل العمليات
+</button>
+
+</div>
+
+<div
+  class="card"
+  id="activityList"
+></div>
+
+</section>
+
+
+<section
+  class="page"
+  id="inventory"
+>
+
+<div class="title">
+المخزون
+</div>
+
+<div class="subtitle">
+ابحث عن أي سيريال واعرف هل هو متبقي أو تم تسليمه.
+</div>
+
+<input
+  class="search"
+  id="searchInput"
+  placeholder="ابحث بالسيريال..."
+>
+
+<div class="segments">
+
+<button
+  class="active"
+  data-filter="all"
+>
+الكل
+</button>
+
+<button
+  data-filter="stock"
+>
+المتبقي
+</button>
+
+<button
+  data-filter="delivered"
+>
+تم التسليم
+</button>
+
+</div>
+
+
+<div class="stats">
+
+<div class="stat stock">
+
+<strong id="invStock">
+0
+</strong>
+
+<span>
+متبقي
+</span>
+
+</div>
+
+<div class="stat delivered">
+
+<strong id="invDelivered">
+0
+</strong>
+
+<span>
+تم التسليم
+</span>
+
+</div>
+
+<div class="stat total">
+
+<strong id="invTotal">
+0
+</strong>
+
+<span>
+الإجمالي
+</span>
+
+</div>
+
+</div>
+
+<div
+  class="device-list"
+  id="deviceList"
+></div>
+
+</section>
+
+
+<section
+  class="page"
+  id="scan"
+>
+
+<div class="title">
+الماسح
+</div>
+
+<div class="subtitle">
+اختر استلام أو تسليم، ثم وجّه الكاميرا إلى باركود SN.
+</div>
+
+
+<div class="mode">
+
+<button
+  class="receive active"
+  id="receiveMode"
+>
+📥 استلام
+</button>
+
+<button
+  class="deliver"
+  id="deliverMode"
+>
+📤 تسليم
+</button>
+
+</div>
+
+
+<div class="card camera-card">
+
+<div class="camera">
+
+<video
+  id="video"
+  playsinline
+  muted
+></video>
+
+<div
+  class="cammsg"
+  id="camMsg"
+>
+اضغط تشغيل الكاميرا للبدء
+</div>
+
+<div
+  class="scanbox"
+  id="scanBox"
+></div>
+
+<div
+  class="scanline"
+  id="scanLine"
+></div>
+
+</div>
+
+
+<div class="row">
+
+<button
+  class="btn primary"
+  id="startCam"
+>
+📷 تشغيل الكاميرا
+</button>
+
+<button
+  class="btn secondary"
+  id="stopCam"
+  disabled
+>
+⏹ إيقاف
+</button>
+
+</div>
+
+
+<div
+  class="tools"
+  id="camTools"
+>
+
+<button
+  class="btn secondary"
+  id="focusBtn"
+>
+🎯 تحسين التركيز
+</button>
+
+<button
+  class="btn secondary"
+  id="torchBtn"
+  style="display:none"
+>
+🔦 الفلاش
+</button>
+
+</div>
+
+
+<div
+  class="zoom"
+  id="zoomWrap"
+>
+
+<div class="zoomhead">
+
+<span>
+🔍 التكبير
+</span>
+
+<span id="zoomValue">
+1.0×
+</span>
+
+</div>
+
+<input
+  id="zoomSlider"
+  type="range"
+  min="1"
+  max="1"
+  step=".1"
+  value="1"
+>
+
+</div>
+
+
+<div
+  class="status"
+  id="status"
+>
+جاهز.
+</div>
+
+
+<div class="manual">
+
+<input
+  id="manualInput"
+  placeholder="NCD700280982"
+>
+
+<button id="manualBtn">
+إضافة
+</button>
+
+</div>
+
+</div>
+
+</section>
+
+
+<section
+  class="page"
+  id="reports"
+>
+
+<div class="title">
+التقرير
+</div>
+
+<div class="subtitle">
+الأرقام التي تحتاجها عندما يسألك المدير عن التسليم والمتبقي.
+</div>
+
+
+<div class="card report-card">
+
+<div>
+التقرير الحالي
+</div>
+
+<div class="report-values">
+
+<div>
+
+<strong id="reportDelivered">
+0
+</strong>
+
+<span>
+سلمت
+</span>
+
+</div>
+
+<div>
+
+<strong id="reportStock">
+0
+</strong>
+
+<span>
+متبقي
+</span>
+
+</div>
+
+</div>
+
+<button
+  class="white-btn"
+  id="copyReport"
+>
+نسخ: سلمت / متبقي
+</button>
+
+</div>
+
+
+<div class="card">
+
+<b>
+طريقة احتساب «سلمت»
+</b>
+
+<p
+  class="subtitle"
+  style="margin:7px 0 0"
+>
+العدد هنا هو إجمالي الأجهزة التي حالتها «تم التسليم» داخل التطبيق، لذلك يبقى صحيحًا بعد تحديث الصفحة أو إغلاق التطبيق.
+</p>
+
+</div>
+
+
+<div class="card">
+
+<b>
+ملف Excel
+</b>
+
+<p
+  class="subtitle"
+  style="margin:7px 0 12px"
+>
+ينشئ قائمة بكل السيريالات وحالتها وتواريخ الاستلام والتسليم.
+</p>
+
+<button
+  class="btn secondary"
+  style="width:100%"
+  id="excelBtn"
+>
+📊 تصدير Excel
+</button>
+
+</div>
+
+</section>
+
+
+<section
+  class="page"
+  id="more"
+>
+
+<div class="title">
+المزيد
+</div>
+
+<div class="subtitle">
+النسخ الاحتياطي وإعدادات البيانات.
+</div>
+
+
+<div class="menu">
+
+<button id="backupBtn">
+
+<span class="mi">
+☁️
+</span>
+
+<span class="copy">
+
+<b>
+حفظ نسخة احتياطية
+</b>
+
+<small>
+حفظ مخزونك وسجل التسليم على جهازك
+</small>
+
+</span>
+
+</button>
+
+
+<button id="restoreBtn">
+
+<span class="mi">
+♻️
+</span>
+
+<span class="copy">
+
+<b>
+استعادة نسخة احتياطية
+</b>
+
+<small>
+استرجاع مخزونك من ملف سابق
+</small>
+
+</span>
+
+</button>
+
+
+<button id="copyStock">
+
+<span class="mi">
+📋
+</span>
+
+<span class="copy">
+
+<b>
+نسخ سيريالات المتبقي
+</b>
+
+<small>
+نسخ كل الأجهزة الموجودة في مخزونك
+</small>
+
+</span>
+
+</button>
+
+
+<button
+  id="installBtn"
+  style="display:none"
+>
+
+<span class="mi">
+📱
+</span>
+
+<span class="copy">
+
+<b>
+تثبيت التطبيق
+</b>
+
+<small>
+إضافته كتطبيق على الشاشة الرئيسية
+</small>
+
+</span>
+
+</button>
+
+</div>
+
+
+<input
+  id="restoreFile"
+  type="file"
+  accept=".json,application/json"
+  class="hidden"
+>
+
+
+<div
+  class="card"
+  style="margin-top:12px"
+>
+
+<b>
+مهم
+</b>
+
+<p
+  class="subtitle"
+  style="margin:7px 0 0"
+>
+بيانات كل موظف محفوظة على جواله فقط.
+</p>
+
+</div>
+
+</section>
+
+</main>
+
+</div>
+
+
 <nav class="bottom">
-  <button class="nav active" data-page="home"><i>⌂</i><span>الرئيسية</span></button>
-  <button class="nav" data-page="inventory"><i>▦</i><span>المخزون</span></button>
-  <button class="nav scan" data-page="scan"><i>▣</i><span>المسح</span></button>
-  <button class="nav" data-page="reports"><i>▥</i><span>التقرير</span></button>
-  <button class="nav" data-page="more"><i>•••</i><span>المزيد</span></button>
+
+<button
+  class="nav active"
+  data-page="home"
+>
+<i>⌂</i>
+<span>الرئيسية</span>
+</button>
+
+<button
+  class="nav"
+  data-page="inventory"
+>
+<i>▦</i>
+<span>المخزون</span>
+</button>
+
+<button
+  class="nav scan"
+  data-page="scan"
+>
+<i>▣</i>
+<span>المسح</span>
+</button>
+
+<button
+  class="nav"
+  data-page="reports"
+>
+<i>▥</i>
+<span>التقرير</span>
+</button>
+
+<button
+  class="nav"
+  data-page="more"
+>
+<i>•••</i>
+<span>المزيد</span>
+</button>
+
 </nav>
-<div class="toast" id="toast"></div><div class="flash" id="flash"></div>
+
+
+<div
+  class="toast"
+  id="toast"
+></div>
+
+<div
+  class="flash"
+  id="flash"
+></div>
+
 
 <script>
-const MODEL="Newland N950";
-const SERIAL_RE=/^NCD\d{9}$/i;
-const STORAGE_KEY="n950_inventory_v2_devices";
-const LAST_PAGE_KEY="n950_inventory_v2_last_page";
-const MODE_KEY="n950_inventory_v2_last_mode";
-const $=id=>document.getElementById(id);
-let devices=loadDevices();
-let currentFilter="all",searchTerm="";
-let showAllActivities=false;
-let mode=localStorage.getItem(MODE_KEY)==="deliver"?"deliver":"receive";
-let stream=null,videoTrack=null,detector=null,zxingReader=null,zxingControls=null,zxingResetTimer=null,scanEngine="",scanning=false,scanFrame=null,activeSeen="",lastSeenAt=0,torchOn=false,audioCtx=null;
 
-function loadDevices(){try{const a=JSON.parse(localStorage.getItem(STORAGE_KEY)||"[]");return Array.isArray(a)?a.filter(x=>x&&SERIAL_RE.test(String(x.serial||""))):[]}catch{return[]}}
-function save(){localStorage.setItem(STORAGE_KEY,JSON.stringify(devices))}
-function normalize(v){return String(v||"").toUpperCase().replace(/[^A-Z0-9]/g,"").trim()}
-function stock(){return devices.filter(x=>x.status==="stock")}
-function delivered(){return devices.filter(x=>x.status==="delivered")}
-function deliveredSinceReset(){return delivered()}
-function fmt(t){if(!t)return"";try{return new Date(t).toLocaleString("ar-SA",{dateStyle:"short",timeStyle:"short"})}catch{return new Date(t).toLocaleString()}}
-function escapeHtml(s){return String(s).replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]))}
-function toast(msg){const t=$("toast");t.textContent=msg;t.classList.add("show");clearTimeout(toast.timer);toast.timer=setTimeout(()=>t.classList.remove("show"),2200)}
-function setStatus(msg,type=""){const s=$("status");s.textContent=msg;s.className="status"+(type?" "+type:"")}
-function flash(type){const f=$("flash");f.className="flash "+type;setTimeout(()=>f.className="flash",600)}
-function unlockAudio(){try{if(!audioCtx)audioCtx=new (window.AudioContext||window.webkitAudioContext)();if(audioCtx.state==="suspended")audioCtx.resume()}catch{}}
-function tone(freq,start,dur,type="sine",gainVal=.25){if(!audioCtx)return;const o=audioCtx.createOscillator(),g=audioCtx.createGain();o.type=type;o.frequency.setValueAtTime(freq,start);g.gain.setValueAtTime(.0001,start);g.gain.exponentialRampToValueAtTime(gainVal,start+.01);g.gain.exponentialRampToValueAtTime(.0001,start+dur);o.connect(g);g.connect(audioCtx.destination);o.start(start);o.stop(start+dur+.03)}
-function successFeedback(){unlockAudio();try{navigator.vibrate?.([120,60,120])}catch{};try{const n=audioCtx.currentTime;tone(950,n,.12);tone(1350,n+.14,.15)}catch{}flash("ok")}
-function errorFeedback(){unlockAudio();try{navigator.vibrate?.([220,80,220])}catch{};try{const n=audioCtx.currentTime;tone(520,n,.18,"square",.18);tone(300,n+.20,.24,"square",.18)}catch{}flash("bad")}
+const MODEL =
+  "Newland N950";
+
+const SERIAL_RE =
+  /^NCD\d{9}$/i;
+
+const STORAGE_KEY =
+  "n950_inventory_v2_devices";
+
+const LAST_PAGE_KEY =
+  "n950_inventory_v2_last_page";
+
+const MODE_KEY =
+  "n950_inventory_v2_last_mode";
+
+const $ =
+  id =>
+    document.getElementById(id);
+
+let devices =
+  loadDevices();
+
+let currentFilter =
+  "all";
+
+let searchTerm =
+  "";
+
+let showAllActivities =
+  false;
+
+let mode =
+  localStorage.getItem(
+    MODE_KEY
+  ) === "deliver"
+    ? "deliver"
+    : "receive";
+
+let stream = null;
+let videoTrack = null;
+let detector = null;
+let zxingReader = null;
+let zxingControls = null;
+let zxingResetTimer = null;
+let scanEngine = "";
+let scanning = false;
+let scanFrame = null;
+let activeSeen = "";
+let lastSeenAt = 0;
+let torchOn = false;
+let audioCtx = null;
+
+
+function loadDevices(){
+
+  try{
+
+    const a =
+      JSON.parse(
+        localStorage.getItem(
+          STORAGE_KEY
+        ) || "[]"
+      );
+
+    return Array.isArray(a)
+      ? a.filter(
+          x =>
+            x &&
+            SERIAL_RE.test(
+              String(
+                x.serial || ""
+              )
+            )
+        )
+      : [];
+
+  }catch{
+
+    return [];
+
+  }
+}
+
+
+function save(){
+
+  localStorage.setItem(
+    STORAGE_KEY,
+    JSON.stringify(devices)
+  );
+
+}
+
+
+function normalize(v){
+
+  return String(v || "")
+    .toUpperCase()
+    .replace(
+      /[^A-Z0-9]/g,
+      ""
+    )
+    .trim();
+
+}
+
+
+function stock(){
+
+  return devices.filter(
+    x =>
+      x.status === "stock"
+  );
+
+}
+
+
+function delivered(){
+
+  return devices.filter(
+    x =>
+      x.status === "delivered"
+  );
+
+}
+
+
+function fmt(t){
+
+  if(!t) return "";
+
+  try{
+
+    return new Date(t)
+      .toLocaleString(
+        "ar-SA",
+        {
+          dateStyle:"short",
+          timeStyle:"short"
+        }
+      );
+
+  }catch{
+
+    return new Date(t)
+      .toLocaleString();
+
+  }
+
+}
+
+
+function escapeHtml(s){
+
+  return String(s)
+    .replace(
+      /[&<>"']/g,
+      c => ({
+        "&":"&amp;",
+        "<":"&lt;",
+        ">":"&gt;",
+        '"':"&quot;",
+        "'":"&#39;"
+      }[c])
+    );
+
+}
+
+
+function toast(msg){
+
+  const t =
+    $("toast");
+
+  t.textContent =
+    msg;
+
+  t.classList.add(
+    "show"
+  );
+
+  clearTimeout(
+    toast.timer
+  );
+
+  toast.timer =
+    setTimeout(
+      () =>
+        t.classList.remove(
+          "show"
+        ),
+      2200
+    );
+
+}
+
+
+function setStatus(
+  msg,
+  type=""
+){
+
+  const s =
+    $("status");
+
+  s.textContent =
+    msg;
+
+  s.className =
+    "status" +
+    (
+      type
+        ? " " + type
+        : ""
+    );
+
+}
+
+
+function flash(type){
+
+  const f =
+    $("flash");
+
+  f.className =
+    "flash " + type;
+
+  setTimeout(
+    () =>
+      f.className =
+        "flash",
+    600
+  );
+
+}
+
+
+function unlockAudio(){
+
+  try{
+
+    if(!audioCtx){
+
+      audioCtx =
+        new (
+          window.AudioContext ||
+          window.webkitAudioContext
+        )();
+
+    }
+
+    if(
+      audioCtx.state ===
+      "suspended"
+    ){
+
+      audioCtx.resume();
+
+    }
+
+  }catch{}
+
+}
+
+
+function tone(
+  freq,
+  start,
+  dur,
+  type="sine",
+  gainVal=.25
+){
+
+  if(!audioCtx) return;
+
+  const o =
+    audioCtx
+      .createOscillator();
+
+  const g =
+    audioCtx
+      .createGain();
+
+  o.type =
+    type;
+
+  o.frequency
+    .setValueAtTime(
+      freq,
+      start
+    );
+
+  g.gain
+    .setValueAtTime(
+      .0001,
+      start
+    );
+
+  g.gain
+    .exponentialRampToValueAtTime(
+      gainVal,
+      start + .01
+    );
+
+  g.gain
+    .exponentialRampToValueAtTime(
+      .0001,
+      start + dur
+    );
+
+  o.connect(g);
+
+  g.connect(
+    audioCtx.destination
+  );
+
+  o.start(start);
+
+  o.stop(
+    start +
+    dur +
+    .03
+  );
+
+}
+
+
+function successFeedback(){
+
+  unlockAudio();
+
+  try{
+
+    navigator.vibrate?.(
+      [120,60,120]
+    );
+
+  }catch{}
+
+  try{
+
+    const n =
+      audioCtx.currentTime;
+
+    tone(
+      950,
+      n,
+      .12
+    );
+
+    tone(
+      1350,
+      n + .14,
+      .15
+    );
+
+  }catch{}
+
+  flash("ok");
+
+}
+
+
+function errorFeedback(){
+
+  unlockAudio();
+
+  try{
+
+    navigator.vibrate?.(
+      [220,80,220]
+    );
+
+  }catch{}
+
+  try{
+
+    const n =
+      audioCtx.currentTime;
+
+    tone(
+      520,
+      n,
+      .18,
+      "square",
+      .18
+    );
+
+    tone(
+      300,
+      n + .20,
+      .24,
+      "square",
+      .18
+    );
+
+  }catch{}
+
+  flash("bad");
+
+}
+
 
 function render(){
-  const s=stock().length,d=delivered().length,t=devices.length;
-  ["homeStock","invStock","reportStock","reportStockHome"].forEach(id=>$(id).textContent=s);
-  ["homeDelivered","reportDelivered","reportDeliveredHome"].forEach(id=>$(id).textContent=d);
-  $("homeTotal").textContent=t;$("invTotal").textContent=t;$("invDelivered").textContent=delivered().length;
-  renderActivity();renderInventory();
+
+  const s =
+    stock().length;
+
+  const d =
+    delivered().length;
+
+  const t =
+    devices.length;
+
+  [
+    "homeStock",
+    "invStock",
+    "reportStock",
+    "reportStockHome"
+  ].forEach(
+    id =>
+      $(id).textContent =
+        s
+  );
+
+  [
+    "homeDelivered",
+    "reportDelivered",
+    "reportDeliveredHome"
+  ].forEach(
+    id =>
+      $(id).textContent =
+        d
+  );
+
+  $("homeTotal")
+    .textContent =
+      t;
+
+  $("invTotal")
+    .textContent =
+      t;
+
+  $("invDelivered")
+    .textContent =
+      d;
+
+  renderActivity();
+
+  renderInventory();
+
 }
+
+
 function renderActivity(){
-  const list=$("activityList"),btn=$("toggleActivityBtn"),acts=[];
-  devices.forEach(x=>{
-    if(x.receivedAt)acts.push({type:"receive",serial:x.serial,time:Number(x.receivedAt)});
-    if(x.deliveredAt)acts.push({type:"deliver",serial:x.serial,time:Number(x.deliveredAt)});
-  });
-  acts.sort((a,b)=>b.time-a.time);
-  const shown=showAllActivities?acts:acts.slice(0,5);
+
+  const list =
+    $("activityList");
+
+  const btn =
+    $("toggleActivityBtn");
+
+  const acts =
+    [];
+
+  devices.forEach(
+    x => {
+
+      if(x.receivedAt){
+
+        acts.push({
+          type:"receive",
+          serial:x.serial,
+          time:Number(
+            x.receivedAt
+          )
+        });
+
+      }
+
+      if(x.deliveredAt){
+
+        acts.push({
+          type:"deliver",
+          serial:x.serial,
+          time:Number(
+            x.deliveredAt
+          )
+        });
+
+      }
+
+    }
+  );
+
+  acts.sort(
+    (a,b) =>
+      b.time -
+      a.time
+  );
+
+  const shown =
+    showAllActivities
+      ? acts
+      : acts.slice(
+          0,
+          5
+        );
+
   if(btn){
-    btn.style.display=acts.length>5?"inline-block":"none";
-    btn.textContent=showAllActivities?"عرض آخر 5":"عرض كل العمليات";
+
+    btn.style.display =
+      acts.length > 5
+        ? "inline-block"
+        : "none";
+
+    btn.textContent =
+      showAllActivities
+        ? "عرض آخر 5"
+        : "عرض كل العمليات";
+
   }
-  list.innerHTML=shown.length?shown.map(a=>`<div class="activity"><div class="actico ${a.type}">${a.type==="receive"?"📥":"📤"}</div><div class="actmain"><b>${escapeHtml(a.serial)}</b><span>${a.type==="receive"?"استلام جهاز":"تسليم جهاز"}</span></div><div class="time">${fmt(a.time)}</div></div>`).join(""):`<div class="empty">لا توجد عمليات بعد.<br>ابدأ باستلام أول جهاز.</div>`;
-}
-function renderInventory(){let arr=[...devices].sort((a,b)=>Number(b.receivedAt||0)-Number(a.receivedAt||0));if(currentFilter!=="all")arr=arr.filter(x=>x.status===currentFilter);if(searchTerm)arr=arr.filter(x=>x.serial.includes(searchTerm));$("deviceList").innerHTML=arr.length?arr.map(x=>`<div class="device"><div class="box">📦</div><div class="main"><b>${escapeHtml(x.serial)}</b><small>${MODEL}</small><br><span class="pill ${x.status}">${x.status==="stock"?"متبقي":"تم التسليم"}</span></div><button class="trash" onclick="deleteDevice('${escapeHtml(x.serial)}')">🗑</button></div>`).join(""):`<div class="card empty">لا توجد أجهزة مطابقة.</div>`}
-window.deleteDevice=serial=>{const d=devices.find(x=>x.serial===serial);if(!d)return;if(confirm(`حذف ${serial} نهائيًا من بيانات التطبيق؟`)){devices=devices.filter(x=>x.serial!==serial);save();render();toast("تم حذف الجهاز")}}
 
-function processSerial(raw){const serial=normalize(raw);if(!SERIAL_RE.test(serial)){setStatus("❌ السيريال غير صحيح. المطلوب مثل NCD700280982","bad");errorFeedback();return false}const found=devices.find(x=>x.serial===serial);
-  if(mode==="receive"){
-    if(found){setStatus(found.status==="stock"?`⚠️ ${serial} موجود أصلًا في المخزون`:`⚠️ ${serial} مسجل سابقًا وتم تسليمه`,"warn");errorFeedback();return false}
-    devices.unshift({model:MODEL,serial,status:"stock",receivedAt:Date.now(),deliveredAt:null});save();render();setStatus(`✅ تم استلام ${serial}`,"ok");successFeedback();return true;
+  list.innerHTML =
+    shown.length
+
+    ? shown.map(
+        a => `
+
+        <div class="activity">
+
+          <div class="actico ${a.type}">
+            ${
+              a.type ===
+              "receive"
+                ? "📥"
+                : "📤"
+            }
+          </div>
+
+          <div class="actmain">
+
+            <b>
+              ${escapeHtml(a.serial)}
+            </b>
+
+            <span>
+              ${
+                a.type ===
+                "receive"
+                  ? "استلام جهاز"
+                  : "تسليم جهاز"
+              }
+            </span>
+
+          </div>
+
+          <div class="time">
+            ${fmt(a.time)}
+          </div>
+
+        </div>
+
+        `
+      ).join("")
+
+    : `
+
+      <div class="empty">
+        لا توجد عمليات بعد.
+        <br>
+        ابدأ باستلام أول جهاز.
+      </div>
+
+      `;
+
+}
+
+
+function renderInventory(){
+
+  let arr =
+    [...devices]
+      .sort(
+        (a,b) =>
+          Number(
+            b.receivedAt || 0
+          ) -
+          Number(
+            a.receivedAt || 0
+          )
+      );
+
+  if(
+    currentFilter !==
+    "all"
+  ){
+
+    arr =
+      arr.filter(
+        x =>
+          x.status ===
+          currentFilter
+      );
+
   }
-  if(!found){setStatus(`❌ ${serial} غير موجود في مخزونك`,"bad");errorFeedback();return false}
-  if(found.status==="delivered"){setStatus(`❌ ${serial} تم تسليمه سابقًا`,"bad");errorFeedback();return false}
-  found.status="delivered";found.deliveredAt=Date.now();save();render();setStatus(`✅ تم تسليم ${serial}`,"ok");successFeedback();return true;
+
+  if(searchTerm){
+
+    arr =
+      arr.filter(
+        x =>
+          x.serial
+            .includes(
+              searchTerm
+            )
+      );
+
+  }
+
+  $("deviceList")
+    .innerHTML =
+      arr.length
+
+      ? arr.map(
+          x => `
+
+          <div class="device">
+
+            <div class="box">
+              📦
+            </div>
+
+            <div class="main">
+
+              <b>
+                ${escapeHtml(x.serial)}
+              </b>
+
+              <small>
+                ${MODEL}
+              </small>
+
+              <br>
+
+              <span class="pill ${x.status}">
+
+                ${
+                  x.status ===
+                  "stock"
+                    ? "متبقي"
+                    : "تم التسليم"
+                }
+
+              </span>
+
+            </div>
+
+            <button
+              class="trash"
+              onclick="deleteDevice('${escapeHtml(x.serial)}')"
+            >
+              🗑
+            </button>
+
+          </div>
+
+          `
+        ).join("")
+
+      : `
+
+        <div class="card empty">
+          لا توجد أجهزة مطابقة.
+        </div>
+
+        `;
+
 }
-function setMode(m){mode=m;localStorage.setItem(MODE_KEY,m);$("receiveMode").classList.toggle("active",m==="receive");$("deliverMode").classList.toggle("active",m==="deliver");$("manualBtn").textContent=m==="receive"?"استلام":"تسليم";setStatus(m==="receive"?"وضع الاستلام: امسح أجهزة الدفعة الجديدة.":"وضع التسليم: امسح الأجهزة التي أعطيتها للعميل.")}
 
-async function startCamera(){
-  unlockAudio();
-  if(!navigator.mediaDevices?.getUserMedia){setStatus("المتصفح لا يدعم الكاميرا","bad");return}
 
-  try{
-    stream=await navigator.mediaDevices.getUserMedia({
-      video:{
-        facingMode:{ideal:"environment"},
-        width:{ideal:2560},
-        height:{ideal:1440},
-        frameRate:{ideal:30,max:30}
-      },
-      audio:false
+window.deleteDevice =
+function(serial){
+
+  const d =
+    devices.find(
+      x =>
+        x.serial === serial
+    );
+
+  if(!d) return;
+
+  if(
+    confirm(
+      `حذف ${serial} نهائيًا من بيانات التطبيق؟`
+    )
+  ){
+
+    devices =
+      devices.filter(
+        x =>
+          x.serial !== serial
+      );
+
+    save();
+
+    render();
+
+    toast(
+      "تم حذف الجهاز"
+    );
+
+  }
+
+};
+
+
+function processSerial(raw){
+
+  const serial =
+    normalize(raw);
+
+  if(
+    !SERIAL_RE.test(serial)
+  ){
+
+    setStatus(
+      "❌ السيريال غير صحيح. المطلوب مثل NCD700280982",
+      "bad"
+    );
+
+    errorFeedback();
+
+    return false;
+  }
+
+  const found =
+    devices.find(
+      x =>
+        x.serial === serial
+    );
+
+  if(
+    mode === "receive"
+  ){
+
+    if(found){
+
+      setStatus(
+
+        found.status ===
+        "stock"
+
+          ? `⚠️ ${serial} موجود أصلًا في المخزون`
+
+          : `⚠️ ${serial} مسجل سابقًا وتم تسليمه`,
+
+        "warn"
+      );
+
+      errorFeedback();
+
+      return false;
+    }
+
+    devices.unshift({
+
+      model:MODEL,
+
+      serial,
+
+      status:"stock",
+
+      receivedAt:
+        Date.now(),
+
+      deliveredAt:null
+
     });
 
-    $("video").srcObject=stream;
-    await $("video").play();
-    videoTrack=stream.getVideoTracks()[0]||null;
+    save();
+
+    render();
+
+    setStatus(
+      `✅ تم استلام ${serial}`,
+      "ok"
+    );
+
+    successFeedback();
+
+    return true;
+  }
+
+  if(!found){
+
+    setStatus(
+      `❌ ${serial} غير موجود في مخزونك`,
+      "bad"
+    );
+
+    errorFeedback();
+
+    return false;
+  }
+
+  if(
+    found.status ===
+    "delivered"
+  ){
+
+    setStatus(
+      `❌ ${serial} تم تسليمه سابقًا`,
+      "bad"
+    );
+
+    errorFeedback();
+
+    return false;
+  }
+
+  found.status =
+    "delivered";
+
+  found.deliveredAt =
+    Date.now();
+
+  save();
+
+  render();
+
+  setStatus(
+    `✅ تم تسليم ${serial}`,
+    "ok"
+  );
+
+  successFeedback();
+
+  return true;
+
+}
+
+
+function setMode(m){
+
+  mode = m;
+
+  localStorage.setItem(
+    MODE_KEY,
+    m
+  );
+
+  $("receiveMode")
+    .classList.toggle(
+      "active",
+      m === "receive"
+    );
+
+  $("deliverMode")
+    .classList.toggle(
+      "active",
+      m === "deliver"
+    );
+
+  $("manualBtn")
+    .textContent =
+      m === "receive"
+        ? "استلام"
+        : "تسليم";
+
+  setStatus(
+
+    m === "receive"
+
+      ? "وضع الاستلام: امسح أجهزة الدفعة الجديدة."
+
+      : "وضع التسليم: امسح الأجهزة التي أعطيتها للعميل."
+
+  );
+
+}
+
+
+async function startCamera(){
+
+  unlockAudio();
+
+  if(
+    !navigator.mediaDevices
+      ?.getUserMedia
+  ){
+
+    setStatus(
+      "المتصفح لا يدعم الكاميرا",
+      "bad"
+    );
+
+    return;
+
+  }
+
+  try{
+
+    stream =
+      await navigator
+        .mediaDevices
+        .getUserMedia({
+
+          video:{
+
+            facingMode:{
+              ideal:"environment"
+            },
+
+            width:{
+              ideal:2560
+            },
+
+            height:{
+              ideal:1440
+            },
+
+            frameRate:{
+              ideal:30,
+              max:30
+            }
+
+          },
+
+          audio:false
+
+        });
+
+    $("video")
+      .srcObject =
+        stream;
+
+    await $("video")
+      .play();
+
+    videoTrack =
+      stream
+        .getVideoTracks()[0] ||
+      null;
+
     await optimizeCamera();
 
-    scanning=true;
-    $("startCam").disabled=true;
-    $("stopCam").disabled=false;
-    $("camMsg").style.display="none";
-    $("scanBox").style.display="block";
-    $("scanLine").style.display="block";
-    $("camTools").style.display="grid";
+    scanning = true;
 
-    // Android/Chrome: نستخدم BarcodeDetector لأنه الأسرع على الأجهزة التي تدعمه.
-    if("BarcodeDetector" in window){
-      const supported=await BarcodeDetector.getSupportedFormats();
-      const wanted=["code_128","code_39","ean_13","ean_8","itf","codabar"].filter(x=>supported.includes(x));
-      detector=new BarcodeDetector({formats:wanted.length?wanted:supported});
-      scanEngine="native";
-      setStatus("📷 الماسح جاهز — Android/Chrome");
+    $("startCam")
+      .disabled =
+        true;
+
+    $("stopCam")
+      .disabled =
+        false;
+
+    $("camMsg")
+      .style.display =
+        "none";
+
+    $("scanBox")
+      .style.display =
+        "block";
+
+    $("scanLine")
+      .style.display =
+        "block";
+
+    $("camTools")
+      .style.display =
+        "grid";
+
+    if(
+      "BarcodeDetector"
+      in window
+    ){
+
+      const supported =
+        await BarcodeDetector
+          .getSupportedFormats();
+
+      const wanted =
+        [
+          "code_128",
+          "code_39",
+          "ean_13",
+          "ean_8",
+          "itf",
+          "codabar"
+        ].filter(
+          x =>
+            supported
+              .includes(x)
+        );
+
+      detector =
+        new BarcodeDetector({
+
+          formats:
+            wanted.length
+              ? wanted
+              : supported
+
+        });
+
+      scanEngine =
+        "native";
+
+      setStatus(
+        "📷 الماسح جاهز — Android/Chrome"
+      );
+
       scanLoop();
+
       return;
     }
 
-    // iPhone/Safari fallback: ZXing يعمل بدون BarcodeDetector.
-    if(window.ZXingBrowser?.BrowserMultiFormatReader){
-      scanEngine="zxing";
-      zxingReader=new ZXingBrowser.BrowserMultiFormatReader();
-      zxingControls=await zxingReader.decodeFromStream(stream,$("video"),(result,error)=>{
-        if(!scanning||!result)return;
-        const raw=typeof result.getText==="function"?result.getText():(result.text||String(result));
-        const v=normalize(raw);
-        if(!SERIAL_RE.test(v))return;
-        const now=Date.now();
-        lastSeenAt=now;
-        if(v===activeSeen)return;
-        activeSeen=v;
-        processSerial(v);
-      });
-      zxingResetTimer=setInterval(()=>{
-        if(activeSeen&&Date.now()-lastSeenAt>1000)activeSeen="";
-      },250);
-      setStatus("📷 الماسح جاهز — iPhone / Safari");
+    if(
+      window.ZXingBrowser
+        ?.BrowserMultiFormatReader
+    ){
+
+      scanEngine =
+        "zxing";
+
+      zxingReader =
+        new ZXingBrowser
+          .BrowserMultiFormatReader();
+
+      zxingControls =
+        await zxingReader
+          .decodeFromStream(
+
+            stream,
+
+            $("video"),
+
+            (
+              result,
+              error
+            ) => {
+
+              if(
+                !scanning ||
+                !result
+              ){
+                return;
+              }
+
+              const raw =
+                typeof result
+                  .getText ===
+                  "function"
+
+                  ? result
+                      .getText()
+
+                  : (
+                      result.text ||
+                      String(result)
+                    );
+
+              const v =
+                normalize(raw);
+
+              if(
+                !SERIAL_RE
+                  .test(v)
+              ){
+                return;
+              }
+
+              const now =
+                Date.now();
+
+              lastSeenAt =
+                now;
+
+              if(
+                v ===
+                activeSeen
+              ){
+                return;
+              }
+
+              activeSeen =
+                v;
+
+              processSerial(v);
+
+            }
+
+          );
+
+      zxingResetTimer =
+        setInterval(
+          () => {
+
+            if(
+              activeSeen &&
+              Date.now() -
+              lastSeenAt >
+              1000
+            ){
+
+              activeSeen =
+                "";
+
+            }
+
+          },
+          250
+        );
+
+      setStatus(
+        "📷 الماسح جاهز — iPhone / Safari"
+      );
+
       return;
     }
 
-    throw new Error("Barcode scanner library unavailable");
+    throw new Error(
+      "Barcode scanner unavailable"
+    );
 
   }catch(e){
+
     console.error(e);
+
     stopCamera();
-    setStatus("❌ تعذر تشغيل الماسح. تأكد من إذن الكاميرا واتصال الإنترنت ثم حاول مرة أخرى.","bad");
+
+    setStatus(
+      "❌ تعذر تشغيل الماسح. تأكد من إذن الكاميرا واتصال الإنترنت ثم حاول مرة أخرى.",
+      "bad"
+    );
+
   }
+
 }
 
-async function optimizeCamera(){if(!videoTrack)return;let c={};try{c=videoTrack.getCapabilities?.()||{}}catch{}const adv=[];if(Array.isArray(c.focusMode)&&c.focusMode.includes("continuous"))adv.push({focusMode:"continuous"});if(Array.isArray(c.exposureMode)&&c.exposureMode.includes("continuous"))adv.push({exposureMode:"continuous"});if(Array.isArray(c.whiteBalanceMode)&&c.whiteBalanceMode.includes("continuous"))adv.push({whiteBalanceMode:"continuous"});if(adv.length)try{await videoTrack.applyConstraints({advanced:adv})}catch{}if(c.zoom&&Number.isFinite(c.zoom.min)&&Number.isFinite(c.zoom.max)){const z=Math.min(c.zoom.max,Math.max(c.zoom.min,2));$("zoomSlider").min=c.zoom.min;$("zoomSlider").max=c.zoom.max;$("zoomSlider").step=c.zoom.step||.1;$("zoomSlider").value=z;$("zoomValue").textContent=z.toFixed(1)+"×";$("zoomWrap").style.display="block";try{await videoTrack.applyConstraints({advanced:[{zoom:z}]})}catch{}}else $("zoomWrap").style.display="none";$("torchBtn").style.display=c.torch===true?"block":"none"}
 
-async function refocus(){if(!videoTrack)return;try{const c=videoTrack.getCapabilities?.()||{};if(Array.isArray(c.focusMode)&&c.focusMode.includes("continuous")){await videoTrack.applyConstraints({advanced:[{focusMode:"continuous"}]});setStatus("🎯 تم تحسين التركيز. ثبّت الجوال لحظة.","ok")}else setStatus("ابتعد قليلًا عن الباركود حتى يضبط التركيز.")}catch{setStatus("التركيز التلقائي شغال حسب دعم كاميرا جهازك.")}}
+async function optimizeCamera(){
+
+  if(!videoTrack) return;
+
+  let c = {};
+
+  try{
+
+    c =
+      videoTrack
+        .getCapabilities?.() ||
+      {};
+
+  }catch{}
+
+  const adv = [];
+
+  if(
+    Array.isArray(
+      c.focusMode
+    ) &&
+    c.focusMode.includes(
+      "continuous"
+    )
+  ){
+
+    adv.push({
+      focusMode:
+        "continuous"
+    });
+
+  }
+
+  if(
+    Array.isArray(
+      c.exposureMode
+    ) &&
+    c.exposureMode.includes(
+      "continuous"
+    )
+  ){
+
+    adv.push({
+      exposureMode:
+        "continuous"
+    });
+
+  }
+
+  if(
+    Array.isArray(
+      c.whiteBalanceMode
+    ) &&
+    c.whiteBalanceMode.includes(
+      "continuous"
+    )
+  ){
+
+    adv.push({
+      whiteBalanceMode:
+        "continuous"
+    });
+
+  }
+
+  if(adv.length){
+
+    try{
+
+      await videoTrack
+        .applyConstraints({
+          advanced:adv
+        });
+
+    }catch{}
+
+  }
+
+  if(
+    c.zoom &&
+    Number.isFinite(
+      c.zoom.min
+    ) &&
+    Number.isFinite(
+      c.zoom.max
+    )
+  ){
+
+    const z =
+      Math.min(
+        c.zoom.max,
+        Math.max(
+          c.zoom.min,
+          2
+        )
+      );
+
+    $("zoomSlider")
+      .min =
+        c.zoom.min;
+
+    $("zoomSlider")
+      .max =
+        c.zoom.max;
+
+    $("zoomSlider")
+      .step =
+        c.zoom.step ||
+        .1;
+
+    $("zoomSlider")
+      .value =
+        z;
+
+    $("zoomValue")
+      .textContent =
+        z.toFixed(1) +
+        "×";
+
+    $("zoomWrap")
+      .style.display =
+        "block";
+
+    try{
+
+      await videoTrack
+        .applyConstraints({
+
+          advanced:[
+            {
+              zoom:z
+            }
+          ]
+
+        });
+
+    }catch{}
+
+  }else{
+
+    $("zoomWrap")
+      .style.display =
+        "none";
+
+  }
+
+  $("torchBtn")
+    .style.display =
+      c.torch === true
+        ? "block"
+        : "none";
+
+}
+
+
+async function refocus(){
+
+  if(!videoTrack) return;
+
+  try{
+
+    const c =
+      videoTrack
+        .getCapabilities?.() ||
+      {};
+
+    if(
+      Array.isArray(
+        c.focusMode
+      ) &&
+      c.focusMode.includes(
+        "continuous"
+      )
+    ){
+
+      await videoTrack
+        .applyConstraints({
+
+          advanced:[
+            {
+              focusMode:
+                "continuous"
+            }
+          ]
+
+        });
+
+      setStatus(
+        "🎯 تم تحسين التركيز. ثبّت الجوال لحظة.",
+        "ok"
+      );
+
+    }else{
+
+      setStatus(
+        "ابتعد قليلًا عن الباركود حتى يضبط التركيز."
+      );
+
+    }
+
+  }catch{}
+
+}
+
 
 function stopCamera(){
-  scanning=false;
-  if(scanFrame)cancelAnimationFrame(scanFrame);
-  scanFrame=null;
-  if(zxingResetTimer){clearInterval(zxingResetTimer);zxingResetTimer=null}
-  if(zxingControls){try{zxingControls.stop()}catch{}zxingControls=null}
-  zxingReader=null;
-  detector=null;
-  scanEngine="";
-  if(stream){try{stream.getTracks().forEach(t=>t.stop())}catch{}stream=null}
-  $("video").srcObject=null;
-  videoTrack=null;
-  torchOn=false;
-  $("camTools").style.display="none";
-  $("zoomWrap").style.display="none";
-  $("torchBtn").style.display="none";
-  $("torchBtn").textContent="🔦 الفلاش";
-  $("startCam").disabled=false;
-  $("stopCam").disabled=true;
-  $("camMsg").style.display="flex";
-  $("scanBox").style.display="none";
-  $("scanLine").style.display="none";
-  activeSeen="";
+
+  scanning =
+    false;
+
+  if(scanFrame){
+
+    cancelAnimationFrame(
+      scanFrame
+    );
+
+  }
+
+  scanFrame =
+    null;
+
+  if(zxingResetTimer){
+
+    clearInterval(
+      zxingResetTimer
+    );
+
+    zxingResetTimer =
+      null;
+
+  }
+
+  if(zxingControls){
+
+    try{
+      zxingControls.stop();
+    }catch{}
+
+    zxingControls =
+      null;
+
+  }
+
+  zxingReader =
+    null;
+
+  detector =
+    null;
+
+  scanEngine =
+    "";
+
+  if(stream){
+
+    try{
+
+      stream
+        .getTracks()
+        .forEach(
+          t =>
+            t.stop()
+        );
+
+    }catch{}
+
+    stream =
+      null;
+
+  }
+
+  $("video")
+    .srcObject =
+      null;
+
+  videoTrack =
+    null;
+
+  torchOn =
+    false;
+
+  $("camTools")
+    .style.display =
+      "none";
+
+  $("zoomWrap")
+    .style.display =
+      "none";
+
+  $("torchBtn")
+    .style.display =
+      "none";
+
+  $("torchBtn")
+    .textContent =
+      "🔦 الفلاش";
+
+  $("startCam")
+    .disabled =
+      false;
+
+  $("stopCam")
+    .disabled =
+      true;
+
+  $("camMsg")
+    .style.display =
+      "flex";
+
+  $("scanBox")
+    .style.display =
+      "none";
+
+  $("scanLine")
+    .style.display =
+      "none";
+
+  activeSeen =
+    "";
+
 }
+
 
 async function scanLoop(){
-  if(!scanning||scanEngine!=="native")return;
+
+  if(
+    !scanning ||
+    scanEngine !==
+    "native"
+  ){
+    return;
+  }
+
   try{
-    if($("video").readyState>=2&&detector){
-      const codes=await detector.detect($("video")),now=Date.now();
-      let saw=false;
-      for(const c of codes){
-        const v=normalize(c.rawValue);
-        if(!SERIAL_RE.test(v))continue;
-        saw=true;
-        lastSeenAt=now;
-        if(v===activeSeen)break;
-        activeSeen=v;
+
+    if(
+      $("video")
+        .readyState >= 2 &&
+      detector
+    ){
+
+      const codes =
+        await detector.detect(
+          $("video")
+        );
+
+      const now =
+        Date.now();
+
+      let saw =
+        false;
+
+      for(
+        const c of codes
+      ){
+
+        const v =
+          normalize(
+            c.rawValue
+          );
+
+        if(
+          !SERIAL_RE
+            .test(v)
+        ){
+          continue;
+        }
+
+        saw =
+          true;
+
+        lastSeenAt =
+          now;
+
+        if(
+          v ===
+          activeSeen
+        ){
+          break;
+        }
+
+        activeSeen =
+          v;
+
         processSerial(v);
+
         break;
       }
-      if(!saw&&activeSeen&&now-lastSeenAt>900)activeSeen="";
+
+      if(
+        !saw &&
+        activeSeen &&
+        now -
+        lastSeenAt >
+        900
+      ){
+
+        activeSeen =
+          "";
+
+      }
+
     }
+
   }catch{}
-  scanFrame=requestAnimationFrame(scanLoop);
+
+  scanFrame =
+    requestAnimationFrame(
+      scanLoop
+    );
+
 }
 
-function showPage(id){localStorage.setItem(LAST_PAGE_KEY,id);document.querySelectorAll(".page").forEach(p=>p.classList.toggle("active",p.id===id));document.querySelectorAll(".nav").forEach(n=>n.classList.toggle("active",n.dataset.page===id));if(id!=="scan"&&scanning)stopCamera();window.scrollTo({top:0,behavior:"smooth"})}
-document.querySelectorAll(".nav").forEach(b=>b.onclick=()=>showPage(b.dataset.page));
-$("homeReceive").onclick=()=>{showPage("scan");setMode("receive")};$("homeDeliver").onclick=()=>{showPage("scan");setMode("deliver")};$("receiveMode").onclick=()=>setMode("receive");$("deliverMode").onclick=()=>setMode("deliver");$("startCam").onclick=startCamera;$("stopCam").onclick=stopCamera;$("focusBtn").onclick=refocus;
-$("zoomSlider").oninput=async e=>{if(!videoTrack)return;const z=Number(e.target.value);$("zoomValue").textContent=z.toFixed(1)+"×";try{await videoTrack.applyConstraints({advanced:[{zoom:z}]})}catch{}};
-$("torchBtn").onclick=async()=>{if(!videoTrack)return;torchOn=!torchOn;try{await videoTrack.applyConstraints({advanced:[{torch:torchOn}]});$("torchBtn").textContent=torchOn?"🔦 إطفاء الفلاش":"🔦 الفلاش"}catch{torchOn=false;setStatus("تعذر التحكم بالفلاش","bad")}};
-$("manualBtn").onclick=()=>{unlockAudio();if(processSerial($("manualInput").value))$("manualInput").value=""};$("manualInput").onkeydown=e=>{if(e.key==="Enter"&&processSerial(e.target.value))e.target.value=""};
-$("searchInput").oninput=e=>{searchTerm=normalize(e.target.value);renderInventory()};document.querySelectorAll("[data-filter]").forEach(b=>b.onclick=()=>{currentFilter=b.dataset.filter;document.querySelectorAll("[data-filter]").forEach(x=>x.classList.toggle("active",x===b));renderInventory()});
 
-async function copyReport(){const txt=`سلمت ${delivered().length} جهاز\nمتبقي ${stock().length} جهاز`;try{await navigator.clipboard.writeText(txt);toast("تم نسخ الرسالة للقروب");successFeedback()}catch{toast("تعذر النسخ")}}
-$("toggleActivityBtn").onclick=()=>{showAllActivities=!showAllActivities;renderActivity();};
-$("copyReport").onclick=copyReport;$("copyReportHome").onclick=copyReport;
-$("copyStock").onclick=async()=>{const a=stock();if(!a.length){toast("لا توجد أجهزة متبقية");return}try{await navigator.clipboard.writeText(a.map(x=>x.serial).join("\n"));toast("تم نسخ سيريالات المتبقي")}catch{toast("تعذر النسخ")}};
-$("excelBtn").onclick=()=>{if(!devices.length){toast("لا توجد بيانات");return}const rows=devices.map((d,i)=>`<tr><td>${i+1}</td><td>${MODEL}</td><td style="mso-number-format:'\\@'">${d.serial}</td><td>${d.status==="stock"?"متبقي":"تم التسليم"}</td><td>${fmt(d.receivedAt)}</td><td>${fmt(d.deliveredAt)}</td></tr>`).join("");const html=`<!doctype html><html><head><meta charset="utf-8"></head><body><table border="1"><tr><th>#</th><th>نوع الجهاز</th><th>Serial Number</th><th>الحالة</th><th>تاريخ الاستلام</th><th>تاريخ التسليم</th></tr>${rows}</table></body></html>`;const blob=new Blob(["\ufeff",html],{type:"application/vnd.ms-excel;charset=utf-8"}),url=URL.createObjectURL(blob),a=document.createElement("a");a.href=url;a.download=`N950_Inventory_${new Date().toISOString().slice(0,10)}.xls`;a.click();setTimeout(()=>URL.revokeObjectURL(url),1000);toast("تم إنشاء ملف Excel")};
+function showPage(id){
 
-function backup(){const data={app:"n950-inventory",version:4,model:MODEL,exportedAt:new Date().toISOString(),devices};const blob=new Blob([JSON.stringify(data,null,2)],{type:"application/json"}),url=URL.createObjectURL(blob),a=document.createElement("a");a.href=url;a.download=`N950_Backup_${new Date().toISOString().replace(/[:.]/g,"-").slice(0,19)}.json`;a.click();setTimeout(()=>URL.revokeObjectURL(url),1000);toast("تم حفظ النسخة الاحتياطية");successFeedback()}
-async function restore(file){if(!file)return;try{const data=JSON.parse(await file.text());if(data.app!=="n950-inventory"||!Array.isArray(data.devices))throw new Error("ملف غير صالح");const clean=[];const seen=new Set();for(const x of data.devices){const serial=normalize(x.serial);if(!SERIAL_RE.test(serial)||seen.has(serial))throw new Error("يوجد سيريال غير صالح أو مكرر");seen.add(serial);if(!["stock","delivered"].includes(x.status))throw new Error("حالة جهاز غير صالحة");clean.push({model:MODEL,serial,status:x.status,receivedAt:x.receivedAt||null,deliveredAt:x.status==="delivered"?(x.deliveredAt||null):null})}if(!confirm(`استعادة ${clean.length} جهاز؟\nسيتم استبدال البيانات الحالية على هذا الجوال.`))return;devices=clean;save();render();toast("تمت الاستعادة بنجاح");successFeedback()}catch(e){alert("تعذر الاستعادة: "+e.message);errorFeedback()}finally{$("restoreFile").value=""}}
-$("backupBtn").onclick=backup;$("quickBackup").onclick=backup;$("restoreBtn").onclick=()=>$("restoreFile").click();$("restoreFile").onchange=e=>restore(e.target.files?.[0]);
+  localStorage.setItem(
+    LAST_PAGE_KEY,
+    id
+  );
 
-let deferredPrompt=null;window.addEventListener("beforeinstallprompt",e=>{e.preventDefault();deferredPrompt=e;$("installBtn").style.display="flex"});$("installBtn").onclick=async()=>{if(!deferredPrompt)return;deferredPrompt.prompt();await deferredPrompt.userChoice;deferredPrompt=null;$("installBtn").style.display="none"};
-window.addEventListener("beforeunload",stopCamera);if("serviceWorker" in navigator)window.addEventListener("load",()=>navigator.serviceWorker.register("sw.js"));
-render();setMode(mode);{const savedPage=localStorage.getItem(LAST_PAGE_KEY);const allowed=["home","inventory","scan","reports","more"];showPage(allowed.includes(savedPage)?savedPage:"home");}
+  document
+    .querySelectorAll(
+      ".page"
+    )
+    .forEach(
+      p =>
+        p.classList.toggle(
+          "active",
+          p.id === id
+        )
+    );
+
+  document
+    .querySelectorAll(
+      ".nav"
+    )
+    .forEach(
+      n =>
+        n.classList.toggle(
+          "active",
+          n.dataset.page === id
+        )
+    );
+
+  if(
+    id !== "scan" &&
+    scanning
+  ){
+
+    stopCamera();
+
+  }
+
+  window.scrollTo({
+    top:0,
+    behavior:"smooth"
+  });
+
+}
+
+
+document
+  .querySelectorAll(
+    ".nav"
+  )
+  .forEach(
+    b =>
+      b.onclick =
+        () =>
+          showPage(
+            b.dataset.page
+          )
+  );
+
+
+$("homeReceive")
+  .onclick =
+    () => {
+
+      showPage("scan");
+
+      setMode(
+        "receive"
+      );
+
+    };
+
+
+$("homeDeliver")
+  .onclick =
+    () => {
+
+      showPage("scan");
+
+      setMode(
+        "deliver"
+      );
+
+    };
+
+
+$("receiveMode")
+  .onclick =
+    () =>
+      setMode(
+        "receive"
+      );
+
+
+$("deliverMode")
+  .onclick =
+    () =>
+      setMode(
+        "deliver"
+      );
+
+
+$("startCam")
+  .onclick =
+    startCamera;
+
+
+$("stopCam")
+  .onclick =
+    stopCamera;
+
+
+$("focusBtn")
+  .onclick =
+    refocus;
+
+
+$("zoomSlider")
+  .oninput =
+    async e => {
+
+      if(!videoTrack) return;
+
+      const z =
+        Number(
+          e.target.value
+        );
+
+      $("zoomValue")
+        .textContent =
+          z.toFixed(1) +
+          "×";
+
+      try{
+
+        await videoTrack
+          .applyConstraints({
+
+            advanced:[
+              {
+                zoom:z
+              }
+            ]
+
+          });
+
+      }catch{}
+
+    };
+
+
+$("torchBtn")
+  .onclick =
+    async () => {
+
+      if(!videoTrack) return;
+
+      torchOn =
+        !torchOn;
+
+      try{
+
+        await videoTrack
+          .applyConstraints({
+
+            advanced:[
+              {
+                torch:
+                  torchOn
+              }
+            ]
+
+          });
+
+        $("torchBtn")
+          .textContent =
+            torchOn
+              ? "🔦 إطفاء الفلاش"
+              : "🔦 الفلاش";
+
+      }catch{
+
+        torchOn =
+          false;
+
+        setStatus(
+          "تعذر التحكم بالفلاش",
+          "bad"
+        );
+
+      }
+
+    };
+
+
+$("manualBtn")
+  .onclick =
+    () => {
+
+      unlockAudio();
+
+      if(
+        processSerial(
+          $("manualInput")
+            .value
+        )
+      ){
+
+        $("manualInput")
+          .value =
+            "";
+
+      }
+
+    };
+
+
+$("manualInput")
+  .onkeydown =
+    e => {
+
+      if(
+        e.key ===
+        "Enter" &&
+        processSerial(
+          e.target.value
+        )
+      ){
+
+        e.target.value =
+          "";
+
+      }
+
+    };
+
+
+$("searchInput")
+  .oninput =
+    e => {
+
+      searchTerm =
+        normalize(
+          e.target.value
+        );
+
+      renderInventory();
+
+    };
+
+
+document
+  .querySelectorAll(
+    "[data-filter]"
+  )
+  .forEach(
+    b =>
+      b.onclick =
+        () => {
+
+          currentFilter =
+            b.dataset.filter;
+
+          document
+            .querySelectorAll(
+              "[data-filter]"
+            )
+            .forEach(
+              x =>
+                x.classList.toggle(
+                  "active",
+                  x === b
+                )
+            );
+
+          renderInventory();
+
+        }
+  );
+
+
+async function copyReport(){
+
+  const txt =
+    `سلمت ${delivered().length} جهاز\nمتبقي ${stock().length} جهاز`;
+
+  try{
+
+    await navigator.clipboard
+      .writeText(txt);
+
+    toast(
+      "تم نسخ الرسالة للقروب"
+    );
+
+    successFeedback();
+
+  }catch{
+
+    toast(
+      "تعذر النسخ"
+    );
+
+  }
+
+}
+
+
+$("toggleActivityBtn")
+  .onclick =
+    () => {
+
+      showAllActivities =
+        !showAllActivities;
+
+      renderActivity();
+
+    };
+
+
+$("copyReport")
+  .onclick =
+    copyReport;
+
+
+$("copyReportHome")
+  .onclick =
+    copyReport;
+
+
+$("copyStock")
+  .onclick =
+    async () => {
+
+      const a =
+        stock();
+
+      if(!a.length){
+
+        toast(
+          "لا توجد أجهزة متبقية"
+        );
+
+        return;
+      }
+
+      try{
+
+        await navigator
+          .clipboard
+          .writeText(
+
+            a.map(
+              x => x.serial
+            ).join("\n")
+
+          );
+
+        toast(
+          "تم نسخ سيريالات المتبقي"
+        );
+
+      }catch{
+
+        toast(
+          "تعذر النسخ"
+        );
+
+      }
+
+    };
+
+
+$("excelBtn")
+  .onclick =
+    () => {
+
+      if(
+        !devices.length
+      ){
+
+        toast(
+          "لا توجد بيانات"
+        );
+
+        return;
+      }
+
+      const rows =
+        devices.map(
+          (d,i) => `
+
+          <tr>
+
+            <td>
+              ${i+1}
+            </td>
+
+            <td>
+              ${MODEL}
+            </td>
+
+            <td style="mso-number-format:'\\@'">
+              ${d.serial}
+            </td>
+
+            <td>
+              ${
+                d.status ===
+                "stock"
+                  ? "متبقي"
+                  : "تم التسليم"
+              }
+            </td>
+
+            <td>
+              ${fmt(d.receivedAt)}
+            </td>
+
+            <td>
+              ${fmt(d.deliveredAt)}
+            </td>
+
+          </tr>
+
+          `
+        ).join("");
+
+      const html = `
+
+        <!doctype html>
+
+        <html>
+
+        <head>
+
+          <meta charset="utf-8">
+
+        </head>
+
+        <body>
+
+          <table border="1">
+
+            <tr>
+
+              <th>#</th>
+
+              <th>
+                نوع الجهاز
+              </th>
+
+              <th>
+                Serial Number
+              </th>
+
+              <th>
+                الحالة
+              </th>
+
+              <th>
+                تاريخ الاستلام
+              </th>
+
+              <th>
+                تاريخ التسليم
+              </th>
+
+            </tr>
+
+            ${rows}
+
+          </table>
+
+        </body>
+
+        </html>
+
+      `;
+
+      const blob =
+        new Blob(
+          [
+            "\ufeff",
+            html
+          ],
+          {
+            type:
+              "application/vnd.ms-excel;charset=utf-8"
+          }
+        );
+
+      const url =
+        URL.createObjectURL(
+          blob
+        );
+
+      const a =
+        document.createElement(
+          "a"
+        );
+
+      a.href =
+        url;
+
+      a.download =
+        `N950_Inventory_${new Date().toISOString().slice(0,10)}.xls`;
+
+      a.click();
+
+      setTimeout(
+        () =>
+          URL.revokeObjectURL(
+            url
+          ),
+        1000
+      );
+
+      toast(
+        "تم إنشاء ملف Excel"
+      );
+
+    };
+
+
+function backup(){
+
+  const data = {
+
+    app:
+      "n950-inventory",
+
+    version:
+      4,
+
+    model:
+      MODEL,
+
+    exportedAt:
+      new Date()
+        .toISOString(),
+
+    devices
+
+  };
+
+  const blob =
+    new Blob(
+      [
+        JSON.stringify(
+          data,
+          null,
+          2
+        )
+      ],
+      {
+        type:
+          "application/json"
+      }
+    );
+
+  const url =
+    URL.createObjectURL(
+      blob
+    );
+
+  const a =
+    document.createElement(
+      "a"
+    );
+
+  a.href =
+    url;
+
+  a.download =
+    `N950_Backup_${new Date().toISOString().replace(/[:.]/g,"-").slice(0,19)}.json`;
+
+  a.click();
+
+  setTimeout(
+    () =>
+      URL.revokeObjectURL(
+        url
+      ),
+    1000
+  );
+
+  toast(
+    "تم حفظ النسخة الاحتياطية"
+  );
+
+  successFeedback();
+
+}
+
+
+async function restore(file){
+
+  if(!file) return;
+
+  try{
+
+    const data =
+      JSON.parse(
+        await file.text()
+      );
+
+    if(
+      data.app !==
+      "n950-inventory" ||
+      !Array.isArray(
+        data.devices
+      )
+    ){
+
+      throw new Error(
+        "ملف غير صالح"
+      );
+
+    }
+
+    const clean = [];
+
+    const seen =
+      new Set();
+
+    for(
+      const x of
+      data.devices
+    ){
+
+      const serial =
+        normalize(
+          x.serial
+        );
+
+      if(
+        !SERIAL_RE.test(
+          serial
+        ) ||
+        seen.has(
+          serial
+        )
+      ){
+
+        throw new Error(
+          "يوجد سيريال غير صالح أو مكرر"
+        );
+
+      }
+
+      seen.add(
+        serial
+      );
+
+      if(
+        ![
+          "stock",
+          "delivered"
+        ].includes(
+          x.status
+        )
+      ){
+
+        throw new Error(
+          "حالة جهاز غير صالحة"
+        );
+
+      }
+
+      clean.push({
+
+        model:
+          MODEL,
+
+        serial,
+
+        status:
+          x.status,
+
+        receivedAt:
+          x.receivedAt ||
+          null,
+
+        deliveredAt:
+          x.status ===
+          "delivered"
+            ? (
+                x.deliveredAt ||
+                null
+              )
+            : null
+
+      });
+
+    }
+
+    if(
+      !confirm(
+        `استعادة ${clean.length} جهاز؟`
+      )
+    ){
+      return;
+    }
+
+    devices =
+      clean;
+
+    save();
+
+    render();
+
+    toast(
+      "تمت الاستعادة بنجاح"
+    );
+
+    successFeedback();
+
+  }catch(e){
+
+    alert(
+      "تعذر الاستعادة: " +
+      e.message
+    );
+
+    errorFeedback();
+
+  }finally{
+
+    $("restoreFile")
+      .value =
+        "";
+
+  }
+
+}
+
+
+$("backupBtn")
+  .onclick =
+    backup;
+
+
+$("quickBackup")
+  .onclick =
+    backup;
+
+
+$("restoreBtn")
+  .onclick =
+    () =>
+      $("restoreFile")
+        .click();
+
+
+$("restoreFile")
+  .onchange =
+    e =>
+      restore(
+        e.target.files?.[0]
+      );
+
+
+let deferredPrompt =
+  null;
+
+
+window.addEventListener(
+  "beforeinstallprompt",
+  e => {
+
+    e.preventDefault();
+
+    deferredPrompt =
+      e;
+
+    $("installBtn")
+      .style.display =
+        "flex";
+
+  }
+);
+
+
+$("installBtn")
+  .onclick =
+    async () => {
+
+      if(
+        !deferredPrompt
+      ){
+        return;
+      }
+
+      deferredPrompt
+        .prompt();
+
+      await deferredPrompt
+        .userChoice;
+
+      deferredPrompt =
+        null;
+
+      $("installBtn")
+        .style.display =
+          "none";
+
+    };
+
+
+window.addEventListener(
+  "beforeunload",
+  stopCamera
+);
+
+
+if(
+  "serviceWorker"
+  in navigator
+){
+
+  window.addEventListener(
+    "load",
+    () =>
+      navigator
+        .serviceWorker
+        .register(
+          "sw.js"
+        )
+  );
+
+}
+
+
+render();
+
+setMode(mode);
+
+{
+  const savedPage =
+    localStorage.getItem(
+      LAST_PAGE_KEY
+    );
+
+  const allowed =
+    [
+      "home",
+      "inventory",
+      "scan",
+      "reports",
+      "more"
+    ];
+
+  showPage(
+    allowed.includes(
+      savedPage
+    )
+      ? savedPage
+      : "home"
+  );
+}
+
 </script>
+
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
+<script src="accounts-v9.js"></script>
+
 </body>
+
 </html>
